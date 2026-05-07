@@ -26,6 +26,52 @@ const basescanUrl = `https://basescan.org/address/${walletAddr}#tokentxns`;
 >
   <Fragment slot="head">
     <SchemaOrg type="service" service={service} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does it work without an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. x402 is account-less. Your agent's wallet signs the payment and retries automatically. No registration, no API key, no subscription."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens on failure?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": service.failureBehaviour
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the rate limit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": service.rateLimit
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this open-source?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The service code is closed-source for security reasons. The MCP wrapper that calls it is open-source and MIT-licensed: github.com/mizukaizen/x402-tools-mcp"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who built this?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `Part of the melis.ai agent infrastructure stack. Running on a dedicated Helsinki VPS since early 2026. Contact sean@melis.ai.`
+          }
+        }
+      ]
+    })} />
   </Fragment>
 
   <div class="page-wrap">
@@ -207,8 +253,8 @@ print(resp.json())`}</code></pre>
           <div class="faq-item">
             <h3>Who built this?</h3>
             <p>
-              Built by <a href="https://melis.ai">Sean Melis</a> (sean@melis.ai) as part of the melis.ai
-              agent infrastructure stack. Running on Helsinki VPS since early 2026.
+              Part of the <a href="https://melis.ai">melis.ai</a> agent infrastructure stack.
+              Running on a dedicated Helsinki VPS since early 2026. Contact sean@melis.ai.
             </p>
           </div>
         </section>

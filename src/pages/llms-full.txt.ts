@@ -137,7 +137,7 @@ export const GET: APIRoute = () => {
   lines.push('');
   lines.push('## INFRASTRUCTURE');
   lines.push('');
-  lines.push('- Builder: Sean Melis (sean@melis.ai), based in Australia');
+  lines.push('- Builder: Sean Melis (sean@melis.ai), based in London, UK');
   lines.push('- MCP package: @melis-ai/x402-tools-mcp (npm, MIT)');
   lines.push('- Services hosted on: Helsinki VPS (Hetzner CCX23, Ubuntu 24.04)');
   lines.push('- Settlement chain: Base (Coinbase L2), USDC only');

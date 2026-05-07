@@ -2,7 +2,7 @@
 
 16 pay-per-call x402 utility APIs for AI agents. USDC on Base. No accounts, no API keys, no subscriptions. Charge-on-failure-safe across the fleet.
 
-> Boring infrastructure for AI agents. Built by Sean Melis (sean@melis.ai). A melis.ai product, built in London, UK.
+> Boring infrastructure for AI agents. A melis.ai product, built in London, UK.
 
 Pricing: $0.001 to $0.49 per call, paid in USDC on Base via the x402 protocol.
 Settlement: ~2 seconds on Base (Coinbase L2).
@@ -25,9 +25,9 @@ Fleet status: 14 green / 0 red (last audited 2026-05-07)
 - [NotifyRelay /email](https://notify.melis.ai/email): Send transactional email · $0.005
 - [LinkSafe](https://linksafe.melis.ai/verify): Definitive URL safety check (Playwright sandbox + VirusTotal) · $0.01
 - [ScrapePay](https://scrapepay.melis.ai/scrape): Web extraction via Playwright (robots.txt enforced, charge-on-failure-safe) · $0.01
-- [Screenshot](https://molt.melis.ai/screenshot): Headless Chromium PNG · $0.02
-- [Web Synthesise](https://molt.melis.ai/web/synthesise): Multi-source research synthesis with citations · $0.05
-- [PDF Render](https://molt.melis.ai/pdf/render): High-fidelity URL or HTML → PDF via Playwright · $0.49
+- [Screenshot](https://api.melis.ai/screenshot): Headless Chromium PNG · $0.02
+- [Web Synthesise](https://api.melis.ai/web/synthesise): Multi-source research synthesis with citations · $0.05
+- [PDF Render](https://api.melis.ai/pdf/render): High-fidelity URL or HTML → PDF via Playwright · $0.49
 
 ## Key documentation
 
