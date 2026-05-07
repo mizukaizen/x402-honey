@@ -1,0 +1,51 @@
+---
+import Layout from '../../components/Layout.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import { services } from '../../data/services';
+
+const byCategory = {
+  web:      services.filter(s => s.category === 'web'),
+  safety:   services.filter(s => s.category === 'safety'),
+  notify:   services.filter(s => s.category === 'notify'),
+  convert:  services.filter(s => s.category === 'convert'),
+  validate: services.filter(s => s.category === 'validate'),
+};
+---
+
+<Layout
+  title="All Services"
+  description="All 16 melis x402 pay-per-call utility APIs for AI agents. Web scraping, safety checks, notifications, document conversion, and validation. USDC on Base."
+>
+  <div class="container" style="padding-top:4rem;padding-bottom:4rem;">
+    <h1>All services</h1>
+    <p class="subtitle">16 pay-per-call utilities. No subscriptions.</p>
+
+    {Object.entries(byCategory).map(([cat, svcs]) => svcs.length > 0 && (
+      <div class="cat-section">
+        <h2 class="cat-title">{cat}</h2>
+        <div class="service-grid">
+          {svcs.map(s => <ServiceCard service={s} />)}
+        </div>
+      </div>
+    ))}
+  </div>
+</Layout>
+
+<style>
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.subtitle { color: var(--text-2); margin-bottom: 3rem; }
+.cat-section { margin-bottom: 3rem; }
+.cat-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-bottom: 1rem;
+}
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+</style>

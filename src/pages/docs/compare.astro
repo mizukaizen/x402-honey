@@ -1,0 +1,138 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="Compare — melis x402 Tools vs Alternatives"
+  description="Honest comparison of melis x402 Tools against Orbis, StableEnrich, Exa, BlockRun, agentsvc.io, and other x402 services. Trade-offs and when to use each."
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <a href="/docs/x402-payment" class="doc-nav-link">← x402 Protocol</a>
+      <h1>Comparison vs alternatives</h1>
+      <p class="doc-sub">
+        Honest trade-offs. Melis doesn't win every category — here's when to use something else.
+      </p>
+    </div>
+
+    <section>
+      <h2>vs. Orbis (aggregator)</h2>
+      <p>
+        Orbis is the dominant x402 aggregator — ~40,800 calls/24h, thousands of bundled services,
+        n8n integration, free tier. If you need breadth and want one endpoint for everything, Orbis
+        is the right choice.
+      </p>
+      <p>
+        melis x402 Tools is a curated set of 16 services, not a marketplace. The value is:
+        (a) charge-on-failure-safe across the fleet, (b) SSRF hardening and robots.txt enforcement
+        baked into every service, (c) one MCP package that installs all 16 in seconds,
+        (d) honest documentation with security audit history and on-chain wallet transparency.
+      </p>
+      <p><strong>Choose Orbis when:</strong> you need services beyond melis's 16, or want a free tier.</p>
+      <p><strong>Choose melis when:</strong> you need provable charge-on-failure safety and SSRF hardening.</p>
+    </section>
+
+    <section>
+      <h2>vs. StableEnrich</h2>
+      <p>
+        StableEnrich bundles Apollo, Clado, Exa, Firecrawl, Maps, Serper, Whitepages. It's strong
+        for data enrichment and research (especially company data, contact data, and web search).
+      </p>
+      <p>
+        melis doesn't compete with Exa, Apollo, or Whitepages. The overlap is ScrapePay vs Firecrawl.
+        Firecrawl is faster at scale; ScrapePay enforces robots.txt and is charge-on-failure-safe.
+      </p>
+      <p><strong>Choose StableEnrich when:</strong> you need Exa, Apollo, or Serper bundled together.</p>
+      <p><strong>Choose melis when:</strong> you need robots.txt enforcement or charge-on-failure safety for scraping.</p>
+    </section>
+
+    <section>
+      <h2>vs. Exa</h2>
+      <p>
+        Exa is a neural search engine over a high-quality indexed corpus. Excellent for finding
+        semantically similar documents, recent news, and research. Requires a subscription.
+      </p>
+      <p>
+        ScrapePay hits the live web via Playwright — better for dynamic JS-rendered content,
+        very fresh information (minutes old), and pages Exa hasn't indexed.
+        MarkdownOpt + ScrapePay together cost $0.015; comparable Exa calls require a subscription plan.
+      </p>
+      <p><strong>Choose Exa when:</strong> you need corpus search, semantic similarity, or pre-indexed research quality.</p>
+      <p><strong>Choose ScrapePay when:</strong> you need the live page, JS rendering, or no subscription dependency.</p>
+    </section>
+
+    <section>
+      <h2>vs. BlockRun</h2>
+      <p>
+        BlockRun is an x402 AI model gateway — 55+ LLMs accessible via x402. Complementary to melis,
+        not competing. Use BlockRun for the LLM call; use melis for the infrastructure around it
+        (scraping input, validating output, notifying humans).
+      </p>
+    </section>
+
+    <section>
+      <h2>vs. agentsvc.io</h2>
+      <p>
+        agentsvc.io offers ~20 utility tools at $0.001–$0.008. Similar territory to melis. The
+        overlap is real. Differentiators for melis: SSRF protection (confirmed via live security
+        audit 2026-05-07), robots.txt enforcement on ScrapePay, charge-on-failure at SDK level,
+        and the MCP wrapper for one-command install.
+      </p>
+    </section>
+
+    <section>
+      <h2>Unique services (no x402-native equivalent found)</h2>
+      <table class="compare-table">
+        <thead>
+          <tr><th>Service</th><th>What it does</th><th>Why it's unique</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="/services/linksafe">LinkSafe</a></td>
+            <td>Playwright sandbox + VirusTotal URL check</td>
+            <td>No other x402-native service confirms safety via sandbox + VirusTotal</td>
+          </tr>
+          <tr>
+            <td><a href="/services/linkrisk">LinkRisk</a></td>
+            <td>Heuristic URL risk profile</td>
+            <td>Lightweight pre-filter before LinkSafe; no x402-native equivalent found</td>
+          </tr>
+          <tr>
+            <td><a href="/services/promptguard">PromptGuard</a></td>
+            <td>Prompt injection risk scoring</td>
+            <td>No x402-native prompt injection screen found (matches DataRobot #5 unmet need)</td>
+          </tr>
+          <tr>
+            <td><a href="/services/schemagate">SchemaGate</a></td>
+            <td>JSON Schema validation for LLM output</td>
+            <td>No x402-native output validation found</td>
+          </tr>
+          <tr>
+            <td><a href="/services/cacheserve">CacheServe</a></td>
+            <td>URL fetch with server-side caching</td>
+            <td>No x402-native caching layer found</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">
+        Competitor landscape scanned 2026-05-07 via x402scan, Orbis catalogue, awesome-x402 GitHub.
+        New competitors may have emerged since then.
+      </p>
+    </section>
+  </div>
+</Layout>
+
+<style>
+.doc-page { padding-top: 4rem; padding-bottom: 4rem; max-width: 720px; }
+.doc-header { margin-bottom: 3rem; }
+.doc-nav-link { font-size: 13px; color: var(--text-3); margin-bottom: 1rem; display: block; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.doc-sub { color: var(--text-2); font-size: 15px; }
+section { margin-bottom: 2.5rem; }
+section h2 { font-size: 1.125rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+section p { font-size: 14px; color: var(--text-2); line-height: 1.7; margin-bottom: 0.75rem; }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
+.compare-table th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+.compare-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); color: var(--text-2); vertical-align: top; }
+.note { font-size: 12px !important; color: var(--text-3) !important; }
+</style>

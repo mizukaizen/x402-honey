@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0A0A0A"><title>Compose — Canonical Agent Workflows — melis x402 Tools</title><meta name="description" content="Canonical agent workflow compositions using melis x402 tools. Safe research, notification pipeline, document generation. Code examples and cost breakdowns."><link rel="canonical" href="https://agents.melis.ai/compose/"><!-- Open Graph --><meta property="og:type" content="website"><meta property="og:url" content="https://agents.melis.ai/compose/"><meta property="og:title" content="Compose — Canonical Agent Workflows — melis x402 Tools"><meta property="og:description" content="Canonical agent workflow compositions using melis x402 tools. Safe research, notification pipeline, document generation. Code examples and cost breakdowns."><meta property="og:image" content="https://agents.melis.ai/og.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@melisarchimedes"><meta name="twitter:title" content="Compose — Canonical Agent Workflows — melis x402 Tools"><meta name="twitter:description" content="Canonical agent workflow compositions using melis x402 tools. Safe research, notification pipeline, document generation. Code examples and cost breakdowns."><meta name="twitter:image" content="https://agents.melis.ai/og.png"><!-- Preconnect --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="sitemap" href="/sitemap-index.xml"><style>:root{--bg: #0A0A0A;--surface: #141414;--surface-2: #1E1E1E;--surface-hover: #252525;--border: rgba(255,255,255,.07);--border-light: rgba(255,255,255,.04);--text: #E5E7EB;--text-2: #9CA3AF;--text-3: #6B7280;--accent: #a855f7;--accent-hover: #c084fc;--teal: #5EEAD4;--gold: #C4943A;--accent-subtle: rgba(168,85,247,.1);--teal-subtle: rgba(94,234,212,.1);--gold-subtle: rgba(196,148,58,.1);--font-body: "Inter", system-ui, -apple-system, sans-serif;--font-mono: "JetBrains Mono", "Fira Code", monospace;--radius-sm: 4px;--radius: 8px;--radius-lg: 12px;--max-w: 1100px;--nav-h: 56px}*,*:before,*:after{box-sizing:border-box;margin:0;padding:0}html{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}body{min-height:100vh}a{color:var(--accent);text-decoration:none}a:hover{color:var(--accent-hover);text-decoration:underline}h1,h2,h3,h4{font-weight:600;line-height:1.25;color:var(--text)}code,pre{font-family:var(--font-mono)}pre{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;overflow-x:auto;font-size:13px;line-height:1.6}code:not(pre code){background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px 6px;font-size:.875em;color:var(--teal)}.container{max-width:var(--max-w);margin:0 auto;padding:0 1.5rem}.nav{height:var(--nav-h);border-bottom:1px solid var(--border);background:#0a0a0ad9;backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}.nav-inner{max-width:var(--max-w);margin:0 auto;padding:0 1.5rem;height:100%;display:flex;align-items:center;justify-content:space-between;gap:2rem}.nav-logo{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px;text-decoration:none}.nav-logo:hover{text-decoration:none;color:var(--text)}.nav-logo .bee{color:var(--gold);font-size:16px}.nav-links{display:flex;align-items:center;gap:1.5rem;list-style:none}.nav-links a{font-size:13px;color:var(--text-2);text-decoration:none;transition:color .15s}.nav-links a:hover{color:var(--text);text-decoration:none}.nav-links .cta{background:var(--accent);color:#fff;padding:6px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transition:background .15s}.nav-links .cta:hover{background:var(--accent-hover);color:#fff}.footer{border-top:1px solid var(--border);padding:3rem 0;margin-top:5rem}.footer-inner{max-width:var(--max-w);margin:0 auto;padding:0 1.5rem;display:flex;flex-wrap:wrap;gap:2rem;justify-content:space-between;align-items:flex-start}.footer-brand{font-family:var(--font-mono);font-size:13px;color:var(--text-3)}.footer-brand p{margin-top:.5rem;font-family:var(--font-body);font-size:13px}.footer-links{display:flex;gap:3rem;flex-wrap:wrap}.footer-group h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:.75rem}.footer-group ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}.footer-group a{font-size:13px;color:var(--text-2)}.footer-group a:hover{color:var(--text);text-decoration:none}.badge{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--radius-sm);border:1px solid}.badge-gold{color:var(--gold);border-color:#c4943a59;background:var(--gold-subtle)}.badge-teal{color:var(--teal);border-color:#5eead440;background:var(--teal-subtle)}.badge-purple{color:var(--accent);border-color:#a855f740;background:var(--accent-subtle)}@media(max-width:768px){.nav-links .hide-mobile{display:none}html{font-size:14px}}
+h1[data-astro-cid-h6jihnim]{font-size:2rem;margin-bottom:.75rem}.subtitle[data-astro-cid-h6jihnim]{color:var(--text-2);max-width:640px;margin-bottom:3rem;line-height:1.7}.recipe[data-astro-cid-h6jihnim]{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--border)}.recipe[data-astro-cid-h6jihnim]:last-child{border-bottom:none}.recipe[data-astro-cid-h6jihnim] h2[data-astro-cid-h6jihnim]{font-size:1.375rem;margin-bottom:.75rem}.recipe-desc[data-astro-cid-h6jihnim]{color:var(--text-2);font-size:15px;line-height:1.7;max-width:640px;margin-bottom:1.5rem}.mermaid-wrap[data-astro-cid-h6jihnim]{margin-bottom:1.5rem}.flow-diagram[data-astro-cid-h6jihnim]{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:var(--radius);padding:1rem 1.25rem;font-family:var(--font-mono);font-size:13px;color:var(--teal);white-space:pre-wrap;overflow-x:auto}.cost-line[data-astro-cid-h6jihnim]{font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-top:.5rem}.why-block[data-astro-cid-h6jihnim]{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-top:1.5rem}.why-block[data-astro-cid-h6jihnim] h3[data-astro-cid-h6jihnim]{font-size:13px;font-weight:600;margin-bottom:.5rem;color:var(--text-2)}.why-block[data-astro-cid-h6jihnim] p[data-astro-cid-h6jihnim]{font-size:13px;color:var(--text-3);line-height:1.7}
+</style></head> <body> <nav class="nav"> <div class="nav-inner"> <a href="/" class="nav-logo"> <span class="bee">✦</span>
+melis x402 tools
+</a> <ul class="nav-links"> <li class="hide-mobile"><a href="/services">Services</a></li> <li class="hide-mobile"><a href="/pricing">Pricing</a></li> <li class="hide-mobile"><a href="/compose">Compose</a></li> <li class="hide-mobile"><a href="/docs/install-mcp">Docs</a></li> <li class="hide-mobile"><a href="/faq">FAQ</a></li> <li> <a href="https://www.npmjs.com/package/@melis-ai/x402-tools-mcp" class="cta" target="_blank" rel="noopener">
+npm install →
+</a> </li> </ul> </div> </nav> <main>  <div class="container" style="padding-top:4rem;padding-bottom:4rem;" data-astro-cid-h6jihnim> <h1 data-astro-cid-h6jihnim>Compose</h1> <p class="subtitle" data-astro-cid-h6jihnim>
+Each service is a building block. These are the canonical compositions used in production
+      by OpenClaw agents on Helsinki.
+</p> <!-- Recipe 1 --> <section id="safe-research" class="recipe" data-astro-cid-h6jihnim> <h2 data-astro-cid-h6jihnim>Safe research workflow</h2> <p class="recipe-desc" data-astro-cid-h6jihnim>
+The canonical pattern for any agent that accepts user-provided URLs or queries.
+        Screen untrusted input → risk-check the URL → scrape → clean for LLM → validate output.
+</p> <div class="mermaid-wrap" data-astro-cid-h6jihnim> <pre class="flow-diagram" data-astro-cid-h6jihnim>PromptGuard ($0.002) → LinkRisk ($0.005) → ScrapePay ($0.010) → MarkdownOpt ($0.005) → SchemaGate ($0.001)
+        </pre> <p class="cost-line" data-astro-cid-h6jihnim>Total cost per run: $0.023 USDC</p> </div> <pre data-astro-cid-h6jihnim><code data-astro-cid-h6jihnim>import { McpClient } from &quot;@modelcontextprotocol/sdk/client&quot;;
+
+async function safeResearch(userQuery: string, targetUrl: string, schema: object) {
+  // 1. Screen the user input for prompt injection
+  const guard = await mcp.callTool(&quot;promptguard&quot;, {
+    prompt: userQuery,
+    sensitivity: &quot;medium&quot;,
+  });
+  if (!guard.safe) throw new Error(`Input rejected: ${guard.risk}`);
+
+  // 2. Risk-check the URL before visiting
+  const risk = await mcp.callTool(&quot;linkrisk&quot;, { url: targetUrl });
+  if (risk.risk_level === &quot;high&quot;) throw new Error(`URL blocked: ${risk.flags.join(&quot;, &quot;)}`);
+
+  // 3. Scrape the page
+  const page = await mcp.callTool(&quot;scrapepay&quot;, {
+    url: targetUrl,
+    format: &quot;html&quot;,
+  });
+
+  // 4. Clean the HTML to markdown for the LLM
+  const clean = await mcp.callTool(&quot;markdownopt&quot;, { html: page.content });
+
+  // 5. Call your LLM with the clean content
+  const llmOutput = await callLLM(userQuery, clean.markdown);
+
+  // 6. Validate the LLM output matches your expected schema
+  const valid = await mcp.callTool(&quot;schemagate&quot;, {
+    response: JSON.stringify(llmOutput),
+    schema,
+  });
+  if (!valid.valid) throw new Error(`LLM output invalid: ${valid.hint}`);
+
+  return llmOutput;
+}</code></pre> <div class="why-block" data-astro-cid-h6jihnim> <h3 data-astro-cid-h6jihnim>Why this specific composition?</h3> <p data-astro-cid-h6jihnim>
+PromptGuard prevents jailbreak-style inputs from reaching your scraper or LLM.
+          LinkRisk is cheap ($0.005) and catches obviously dangerous URLs before spending $0.01 on ScrapePay.
+          MarkdownOpt's ~70% token reduction pays for itself on the first LLM call.
+          SchemaGate catches hallucinated fields before they propagate downstream.
+</p> </div> </section> <!-- Recipe 2 --> <section id="notification" class="recipe" data-astro-cid-h6jihnim> <h2 data-astro-cid-h6jihnim>Notification pipeline</h2> <p class="recipe-desc" data-astro-cid-h6jihnim>
+Monitor a page for changes, extract structured data, and alert when conditions are met.
+        Works with any Telegram chat or public webhook endpoint.
+</p> <div class="mermaid-wrap" data-astro-cid-h6jihnim> <pre class="flow-diagram" data-astro-cid-h6jihnim>ScrapePay ($0.010) → StructExtract ($0.002) → [condition check] → NotifyRelay /notify ($0.002)
+        </pre> <p class="cost-line" data-astro-cid-h6jihnim>Total cost per triggered alert: $0.014 USDC</p> </div> <pre data-astro-cid-h6jihnim><code data-astro-cid-h6jihnim>async function monitorAndNotify(
+  pageUrl: string,
+  chatId: string,
+  previousCount: number
+) {
+  // 1. Scrape the page as HTML for structured extraction
+  const page = await mcp.callTool(&quot;scrapepay&quot;, {
+    url: pageUrl,
+    format: &quot;html&quot;,
+  });
+
+  // 2. Extract structured tables from the HTML
+  const data = await mcp.callTool(&quot;structextract&quot;, {
+    html: page.content,
+    extract: [&quot;tables&quot;, &quot;links&quot;],
+  });
+
+  const currentCount = data.tables[0]?.rows.length ?? 0;
+
+  // 3. Only notify if something changed
+  if (currentCount &gt; previousCount) {
+    await mcp.callTool(&quot;notifyrelay_telegram&quot;, {
+      chat_id: chatId,
+      message: [
+        `🆕 *${currentCount} items* found (was ${previousCount})`,
+        `Page: ${pageUrl}`,
+      ].join(&quot;\n&quot;),
+    });
+    return currentCount;
+  }
+
+  return previousCount;
+}</code></pre> <div class="why-block" data-astro-cid-h6jihnim> <h3 data-astro-cid-h6jihnim>Why StructExtract before LLM?</h3> <p data-astro-cid-h6jihnim>
+Raw HTML from ScrapePay includes nav, ads, and boilerplate. Passing it to an LLM
+          to count table rows costs 10–20× more in tokens than using StructExtract first.
+          StructExtract costs $0.002 and returns clean, typed JSON. The LLM only sees what matters.
+</p> </div> </section> <!-- Recipe 3 --> <section id="document" class="recipe" data-astro-cid-h6jihnim> <h2 data-astro-cid-h6jihnim>Document generation workflow</h2> <p class="recipe-desc" data-astro-cid-h6jihnim>
+Fetch a web page, clean it to markdown, generate a PDF, and deliver it by email.
+        Useful for report generation, document archival, and content delivery agents.
+</p> <div class="mermaid-wrap" data-astro-cid-h6jihnim> <pre class="flow-diagram" data-astro-cid-h6jihnim>ScrapePay ($0.010) → MarkdownOpt ($0.005) → DocConvert-PDF ($0.005) → NotifyRelay /email ($0.005)
+        </pre> <p class="cost-line" data-astro-cid-h6jihnim>Total cost per document delivered: $0.025 USDC</p> </div> <pre data-astro-cid-h6jihnim><code data-astro-cid-h6jihnim>async function generateAndDeliverReport(
+  reportUrl: string,
+  recipientEmail: string,
+  subject: string
+) {
+  // 1. Fetch the live page
+  const page = await mcp.callTool(&quot;scrapepay&quot;, {
+    url: reportUrl,
+    format: &quot;html&quot;,
+  });
+
+  // 2. Clean to markdown (removes nav, ads, etc.)
+  const clean = await mcp.callTool(&quot;markdownopt&quot;, { html: page.content });
+
+  // 3. Convert markdown to PDF
+  const pdf = await mcp.callTool(&quot;docconvert_pdf&quot;, {
+    from: &quot;md&quot;,
+    to: &quot;pdf&quot;,
+    content: clean.markdown,
+  });
+
+  // 4. Email the PDF
+  await mcp.callTool(&quot;notifyrelay_email&quot;, {
+    to: recipientEmail,
+    subject,
+    body: `Report generated from ${reportUrl}\n\n[PDF attached — base64 below]\n${pdf.content}`,
+  });
+
+  return {
+    pages: &quot;(see PDF)&quot;,
+    token_reduction: clean.reduction_pct,
+    size_bytes: pdf.size_bytes,
+  };
+}</code></pre> </section> <!-- Recipe 4 --> <section id="url-verification" class="recipe" data-astro-cid-h6jihnim> <h2 data-astro-cid-h6jihnim>URL verification pipeline</h2> <p class="recipe-desc" data-astro-cid-h6jihnim>
+Fast and authoritative URL safety checking for agents that handle user-supplied links.
+        Start cheap, escalate to full sandbox only when needed.
+</p> <div class="mermaid-wrap" data-astro-cid-h6jihnim> <pre class="flow-diagram" data-astro-cid-h6jihnim>LinkRisk ($0.005) → [if medium+] → LinkSafe ($0.010)
+        </pre> <p class="cost-line" data-astro-cid-h6jihnim>Cost: $0.005 for clean URLs, $0.015 for suspicious ones</p> </div> <pre data-astro-cid-h6jihnim><code data-astro-cid-h6jihnim>async function verifyUrl(url: string) {
+  // Fast heuristic check first
+  const risk = await mcp.callTool(&quot;linkrisk&quot;, { url });
+
+  if (risk.risk_level === &quot;high&quot;) {
+    return { safe: false, verdict: &quot;blocked by heuristic&quot;, flags: risk.flags };
+  }
+
+  if (risk.risk_level === &quot;medium&quot;) {
+    // Escalate to full Playwright sandbox + VirusTotal
+    const safe = await mcp.callTool(&quot;linksafe&quot;, { url });
+    return {
+      safe: safe.safe,
+      verdict: safe.safe ? &quot;clean&quot; : &quot;threat detected&quot;,
+      threats: safe.threats,
+      virustotal_positives: safe.virustotal_positives,
+    };
+  }
+
+  return { safe: true, verdict: &quot;clean (heuristic)&quot;, flags: risk.flags };
+}</code></pre> </section> <!-- Recipe 5 --> <section id="cache-and-convert" class="recipe" data-astro-cid-h6jihnim> <h2 data-astro-cid-h6jihnim>Cache and convert workflow</h2> <p class="recipe-desc" data-astro-cid-h6jihnim>
+For multi-agent pipelines where several agents may need the same page.
+        Cache at the session level, extract and convert once.
+</p> <div class="mermaid-wrap" data-astro-cid-h6jihnim> <pre class="flow-diagram" data-astro-cid-h6jihnim>CacheServe ($0.001) → StructExtract ($0.002) → DocConvert-Text ($0.001)
+        </pre> <p class="cost-line" data-astro-cid-h6jihnim>Total cost: $0.004 per session (even if 10 agents need the same page)</p> </div> <pre data-astro-cid-h6jihnim><code data-astro-cid-h6jihnim>async function cachedFetchAndConvert(url: string) {
+  // Fetch with 1-hour cache — subsequent calls return the cached version
+  const cached = await mcp.callTool(&quot;cacheserve&quot;, {
+    url,
+    ttl_seconds: 3600,
+  });
+
+  if (cached.cached) {
+    console.log(`Cache hit from ${cached.cached_at}`);
+  }
+
+  // Extract tables and emails from the HTML
+  const structured = await mcp.callTool(&quot;structextract&quot;, {
+    html: cached.content,
+    extract: [&quot;tables&quot;, &quot;emails&quot;, &quot;links&quot;],
+  });
+
+  // Convert the tables to CSV for a spreadsheet agent
+  if (structured.tables.length &gt; 0) {
+    const csv = await mcp.callTool(&quot;docconvert_text&quot;, {
+      from: &quot;json&quot;,
+      to: &quot;csv&quot;,
+      content: JSON.stringify(structured.tables[0]),
+    });
+    return csv.content;
+  }
+
+  return structured;
+}</code></pre> </section> </div>  </main> <footer class="footer"> <div class="footer-inner"> <div class="footer-brand"> <span>✦ melis x402 tools</span> <p>Boring infrastructure for AI agents.<br>Built by <a href="https://melis.ai">Sean Melis</a>. Based in Australia.</p> </div> <div class="footer-links"> <div class="footer-group"> <h4>Services</h4> <ul> <li><a href="/services/scrapepay">ScrapePay</a></li> <li><a href="/services/markdownopt">MarkdownOpt</a></li> <li><a href="/services/promptguard">PromptGuard</a></li> <li><a href="/services">All 16 →</a></li> </ul> </div> <div class="footer-group"> <h4>Docs</h4> <ul> <li><a href="/docs/install-mcp">MCP Install</a></li> <li><a href="/docs/x402-payment">x402 Protocol</a></li> <li><a href="/docs/compare">Alternatives</a></li> <li><a href="/compose">Compose</a></li> </ul> </div> <div class="footer-group"> <h4>Links</h4> <ul> <li><a href="/llms.txt">llms.txt</a></li> <li><a href="/llms-full.txt">llms-full.txt</a></li> <li> <a href="https://www.npmjs.com/package/@melis-ai/x402-tools-mcp" target="_blank" rel="noopener">npm package</a> </li> <li> <a href="https://basescan.org/address/0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC#tokentxns" target="_blank" rel="noopener">Basescan wallet</a> </li> </ul> </div> </div> </div> </footer> </body></html> 

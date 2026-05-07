@@ -1,0 +1,228 @@
+---
+import Layout from '../components/Layout.astro';
+import { services } from '../data/services';
+
+const sorted = [...services].sort((a, b) => a.price - b.price);
+---
+
+<Layout
+  title="Pricing"
+  description="All 16 melis x402 utility API prices. $0.001 to $0.49 per call. Pay per call in USDC on Base. No subscriptions, no minimum spend."
+>
+  <div class="container" style="padding-top:4rem;padding-bottom:4rem;">
+    <h1>Pricing</h1>
+    <p class="subtitle">
+      Pay per call in USDC on Base. No monthly fee. No minimum spend.
+      Payment settles in ~2 seconds. Charge-on-failure-safe across the fleet.
+    </p>
+
+    <div class="price-table-wrap">
+      <table class="price-table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Price (USDC)</th>
+            <th>Est. calls / $1</th>
+            <th>Est. calls / $10</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sorted.map(s => (
+            <tr>
+              <td>
+                <a href={`/services/${s.slug}`}>{s.name}</a>
+              </td>
+              <td class="price-cell">{s.priceLabel}</td>
+              <td class="number-cell">{Math.floor(1 / s.price).toLocaleString()}</td>
+              <td class="number-cell">{Math.floor(10 / s.price).toLocaleString()}</td>
+              <td class="desc-cell">{s.tagline}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pricing-notes">
+      <h2>Notes</h2>
+      <ul>
+        <li>
+          <strong>Charge-on-failure-safe.</strong> Payment only settles when the service returns HTTP 2xx with
+          non-empty content. If the call fails, you are not charged. This is enforced at the SDK level
+          across all 16 services (fleet rebuilt 2026-05-07).
+        </li>
+        <li>
+          <strong>No accounts.</strong> x402 is account-less. Your wallet signs the payment header; the service
+          verifies and retries automatically. No registration required.
+        </li>
+        <li>
+          <strong>USDC on Base only.</strong> Coinbase's Base L2. Fast finality (~2 seconds), low gas costs.
+          USDC is the only accepted currency.
+        </li>
+        <li>
+          <strong>Bulk pricing.</strong> If you're running high volume (&gt;10,000 calls/month), email
+          sean@melis.ai — internal keys are issued for trusted callers, which bypass the 402 flow and
+          enable monthly invoicing.
+        </li>
+        <li>
+          <strong>Settlement wallets.</strong> 13 core microservices pay to{' '}
+          <a
+            href="https://basescan.org/address/0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC#tokentxns"
+            target="_blank" rel="noopener"
+          >
+            0x1C68…B3bC
+          </a>.
+          Molt Swarm services (Web Synthesise, Screenshot, PDF Render) pay to{' '}
+          <a
+            href="https://basescan.org/address/0x61F2eF18ab0630912D24Fd0A30288619735AfFf5#tokentxns"
+            target="_blank" rel="noopener"
+          >
+            0x61F2…AfFf5
+          </a>.
+        </li>
+      </ul>
+    </div>
+
+    <div class="comparison-section">
+      <h2>vs. alternatives</h2>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Use case</th>
+            <th>melis service</th>
+            <th>melis price</th>
+            <th>Competitor</th>
+            <th>Competitor price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Web scraping</td>
+            <td><a href="/services/scrapepay">ScrapePay</a></td>
+            <td class="price-cell">$0.010</td>
+            <td>Exa</td>
+            <td>~$0.010 (subscription required)</td>
+          </tr>
+          <tr>
+            <td>HTML → markdown</td>
+            <td><a href="/services/markdownopt">MarkdownOpt</a></td>
+            <td class="price-cell">$0.005</td>
+            <td>UtilsForAgents</td>
+            <td>Comparable, no token-reduction metric</td>
+          </tr>
+          <tr>
+            <td>Email delivery</td>
+            <td><a href="/services/notifyrelay-email">NotifyRelay /email</a></td>
+            <td class="price-cell">$0.005</td>
+            <td>StableEmail</td>
+            <td>~$0.006 (subscription-based tier)</td>
+          </tr>
+          <tr>
+            <td>URL safety</td>
+            <td><a href="/services/linksafe">LinkSafe</a></td>
+            <td class="price-cell">$0.010</td>
+            <td>No x402-native equivalent</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Prompt injection screen</td>
+            <td><a href="/services/promptguard">PromptGuard</a></td>
+            <td class="price-cell">$0.002</td>
+            <td>No x402-native equivalent</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>JSON Schema validation</td>
+            <td><a href="/services/schemagate">SchemaGate</a></td>
+            <td class="price-cell">$0.001</td>
+            <td>No x402-native equivalent</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Layout>
+
+<style>
+h1 { font-size: 2rem; margin-bottom: 0.75rem; }
+.subtitle { color: var(--text-2); max-width: 640px; margin-bottom: 3rem; line-height: 1.7; }
+
+.price-table-wrap { overflow-x: auto; margin-bottom: 3rem; }
+
+.price-table,
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.price-table th,
+.compare-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.price-table td,
+.compare-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-2);
+  vertical-align: top;
+}
+
+.price-table tr:hover td,
+.compare-table tr:hover td {
+  background: var(--surface);
+}
+
+.price-cell {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  color: var(--teal) !important;
+  white-space: nowrap;
+}
+
+.number-cell {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  color: var(--text-3) !important;
+}
+
+.desc-cell {
+  color: var(--text-3) !important;
+  font-size: 13px !important;
+}
+
+.pricing-notes {
+  margin-bottom: 3rem;
+}
+
+.pricing-notes h2,
+.comparison-section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.pricing-notes ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pricing-notes li {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+.comparison-section { overflow-x: auto; }
+</style>

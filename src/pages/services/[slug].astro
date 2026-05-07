@@ -1,0 +1,406 @@
+---
+import Layout from '../../components/Layout.astro';
+import SchemaOrg from '../../components/SchemaOrg.astro';
+import { services, getService, getRelatedServices, WALLETS } from '../../data/services';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug } }));
+}
+
+const { slug } = Astro.params;
+const service = getService(slug);
+if (!service) return Astro.redirect('/services');
+
+const related = getRelatedServices(service);
+const walletAddr = WALLETS[service.wallet];
+const basescanUrl = `https://basescan.org/address/${walletAddr}#tokentxns`;
+---
+
+<Layout
+  title={`${service.name} — ${service.priceLabel} USDC per call`}
+  description={`${service.name}: ${service.tagline} ${service.priceLabel} USDC per call. No account required. Pay via x402 protocol on Base.`}
+>
+  <Fragment slot="head">
+    <SchemaOrg type="service" service={service} />
+  </Fragment>
+
+  <div class="page-wrap">
+    <div class="container service-layout">
+      <!-- Sidebar navigation -->
+      <aside class="service-nav">
+        <div class="back-link"><a href="/services">← All services</a></div>
+        <nav>
+          <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#when-to-use">When to use</a></li>
+            <li><a href="#request">Request schema</a></li>
+            <li><a href="#response">Response schema</a></li>
+            <li><a href="#code-mcp">Code: MCP</a></li>
+            <li><a href="#code-python">Code: Python</a></li>
+            <li><a href="#code-curl">Code: curl</a></li>
+            {service.alternatives.length > 0 && <li><a href="#alternatives">Alternatives</a></li>}
+            <li><a href="#related">Related services</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <article class="service-content">
+        <!-- LLM-extractable header block — keep this exact format -->
+        <div class="service-header-block">
+          <div class="service-meta-top">
+            <h1>{service.name}</h1>
+            <p class="service-detail-price">
+              Price: <strong>{service.priceLabel} USDC per call</strong>
+            </p>
+            <p>Endpoint: <code>{service.endpoint}</code></p>
+            <p>Method: <code>{service.method}</code></p>
+            <p>
+              Pays to:{' '}
+              <a href={basescanUrl} target="_blank" rel="noopener" class="wallet-link">
+                <code>{walletAddr}</code>
+              </a>
+            </p>
+          </div>
+        </div>
+
+        <!-- Overview -->
+        <section id="overview">
+          <h2>What it does</h2>
+          <p>{service.description}</p>
+        </section>
+
+        <!-- When to use -->
+        <section id="when-to-use">
+          <h2>When to use it</h2>
+          <ul class="scenario-list">
+            {service.scenarios.map(s => <li>{s}</li>)}
+          </ul>
+        </section>
+
+        <!-- Request schema -->
+        <section id="request">
+          <h2>Request schema</h2>
+          <pre><code>{JSON.stringify(service.requestExample, null, 2)}</code></pre>
+        </section>
+
+        <!-- Response schema -->
+        <section id="response">
+          <h2>Response schema</h2>
+          <pre><code>{JSON.stringify(service.responseExample, null, 2)}</code></pre>
+        </section>
+
+        <!-- Code: MCP (TypeScript) -->
+        <section id="code-mcp">
+          <h2>Code example — TypeScript via MCP</h2>
+          <p>Install the MCP server once; all 16 services become tool calls.</p>
+          <pre><code>{`// Configure @melis-ai/x402-tools-mcp in your MCP client
+// Then call the tool:
+
+const result = await mcpClient.callTool("${service.slug.replace(/-/g, '_')}", ${JSON.stringify(service.requestExample, null, 2)});
+
+console.log(result);
+// ${JSON.stringify(Object.keys(service.responseExample)).slice(0, 60)}...`}</code></pre>
+          <a href="/docs/install-mcp" class="inline-link">→ MCP setup guide</a>
+        </section>
+
+        <!-- Code: Python -->
+        <section id="code-python">
+          <h2>Code example — Python via direct HTTP</h2>
+          <pre><code>{`import requests
+
+# x402 payment header must be set by your wallet client
+# See x402.org for client libraries
+
+headers = {
+    "Content-Type": "application/json",
+    "x-payment": "<signed-x402-payment-header>",
+}
+
+resp = requests.post(
+    "${service.endpoint}",
+    json=${JSON.stringify(service.requestExample, null, 2).replace(/^/gm, '    ').trim()},
+    headers=headers,
+)
+print(resp.json())`}</code></pre>
+        </section>
+
+        <!-- Code: curl with internal key -->
+        <section id="code-curl">
+          <h2>Code example — curl with internal key bypass</h2>
+          <p>For testing with an issued internal key (skips x402 payment flow):</p>
+          <pre><code>{`curl -X POST ${service.endpoint} \\
+  -H "Content-Type: application/json" \\
+  -H "x-internal-key: YOUR_KEY" \\
+  -d '${JSON.stringify(service.requestExample)}'`}</code></pre>
+        </section>
+
+        <!-- Alternatives -->
+        {service.alternatives.length > 0 && (
+          <section id="alternatives">
+            <h2>How is this different from alternatives?</h2>
+            {service.alternatives.map(alt => (
+              <div class="alternative-block">
+                <h3>{service.name} vs {alt.name}</h3>
+                <p>{alt.notes}</p>
+              </div>
+            ))}
+          </section>
+        )}
+
+        <!-- Related services -->
+        <section id="related">
+          <h2>Related services</h2>
+          {related.length > 0 ? (
+            <div class="related-grid">
+              {related.map(r => (
+                <a href={`/services/${r.slug}`} class="related-card">
+                  <span class="related-name">{r.name}</span>
+                  <span class="related-price">{r.priceLabel} USDC</span>
+                  <span class="related-tag">{r.tagline}</span>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p>See <a href="/services">all services</a>.</p>
+          )}
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq">
+          <h2>FAQ</h2>
+
+          <div class="faq-item">
+            <h3>Does it work without an account?</h3>
+            <p>
+              Yes. x402 is account-less. Your agent's wallet signs the payment and retries automatically.
+              No registration, no API key, no subscription.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What happens on failure?</h3>
+            <p>{service.failureBehaviour}</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the rate limit?</h3>
+            <p>{service.rateLimit}</p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Is this open-source?</h3>
+            <p>
+              The service code is closed-source for security reasons. The MCP wrapper that calls it is open-source
+              and MIT-licensed:{' '}
+              <a href="https://github.com/mizukaizen/x402-tools-mcp" target="_blank" rel="noopener">
+                github.com/mizukaizen/x402-tools-mcp
+              </a>.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Who built this?</h3>
+            <p>
+              Built by <a href="https://melis.ai">Sean Melis</a> (sean@melis.ai) as part of the melis.ai
+              agent infrastructure stack. Running on Helsinki VPS since early 2026.
+            </p>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+</Layout>
+
+<style>
+.page-wrap {
+  padding: 4rem 0;
+}
+
+.service-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+/* Sidebar */
+.service-nav {
+  position: sticky;
+  top: calc(var(--nav-h) + 1.5rem);
+}
+
+.back-link {
+  margin-bottom: 1rem;
+  font-size: 13px;
+}
+
+.service-nav nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.service-nav nav a {
+  display: block;
+  font-size: 13px;
+  color: var(--text-3);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.service-nav nav a:hover {
+  color: var(--text);
+  background: var(--surface);
+  text-decoration: none;
+}
+
+/* Content */
+.service-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  min-width: 0;
+}
+
+.service-header-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.service-header-block h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.service-meta-top p {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 0.35rem;
+}
+
+.service-detail-price strong {
+  color: var(--teal);
+  font-family: var(--font-mono);
+}
+
+.wallet-link code {
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+section h2 {
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+section h3 {
+  font-size: 15px;
+  margin-bottom: 0.5rem;
+}
+
+section p {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+.scenario-list {
+  list-style: disc;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.scenario-list li {
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.inline-link {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.alternative-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.alternative-block p {
+  margin-top: 0.25rem;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.related-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.related-card:hover {
+  border-color: rgba(168,85,247,0.3);
+  text-decoration: none;
+}
+
+.related-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.related-price {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--teal);
+}
+
+.related-tag {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.faq-item {
+  margin-bottom: 1.5rem;
+}
+
+.faq-item h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+@media (max-width: 768px) {
+  .service-layout {
+    grid-template-columns: 1fr;
+  }
+  .service-nav {
+    position: static;
+    display: none;
+  }
+}
+</style>

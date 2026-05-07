@@ -1,0 +1,115 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="x402 Payment Protocol"
+  description="How the x402 payment protocol works. The 402 → pay → retry flow. Client libraries, wallet setup, and USDC on Base. 200 words."
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <a href="/docs/install-mcp" class="doc-nav-link">← Install MCP</a>
+      <h1>x402 Payment Protocol</h1>
+      <p class="doc-sub">How payment works. What your agent needs to know.</p>
+    </div>
+
+    <section>
+      <h2>The flow</h2>
+      <p>
+        x402 is built on HTTP. When a service requires payment, it returns HTTP 402 (Payment Required)
+        with a signed payment quote in the response body. Your client reads the quote, signs a USDC
+        payment on Base from your wallet, and retries the original request with an
+        <code>x-payment</code> header containing the signed payment. The service verifies the payment
+        on-chain and returns the result.
+      </p>
+      <pre><code>{`1. Your agent → POST /scrape         (initial request)
+2. Service   ← 402 Payment Required  (payment quote in body)
+3. Your agent → signs USDC payment on Base
+4. Your agent → POST /scrape         (retry with x-payment header)
+5. Service   ← 200 OK + result       (payment settled)`}</code></pre>
+    </section>
+
+    <section>
+      <h2>What you need</h2>
+      <ul>
+        <li>A wallet with USDC on Base.</li>
+        <li>An x402 client library that handles the 402 → sign → retry loop automatically.</li>
+        <li>If using MCP: the MCP server handles the payment flow. Configure <code>X402_PAYMENT_HEADER</code> if your wallet is external.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Client libraries</h2>
+      <p>The x402 spec ships with official client libraries:</p>
+      <pre><code>{`# TypeScript/Node
+npm install x402
+
+# Python
+pip install x402
+
+# Go
+go get github.com/coinbase/x402-go`}</code></pre>
+      <p>
+        See <a href="https://x402.org" target="_blank" rel="noopener">x402.org</a> for the full specification
+        and client library docs.
+      </p>
+    </section>
+
+    <section>
+      <h2>Settlement</h2>
+      <p>
+        Payment settles on Base (Coinbase's L2) in ~2 seconds. USDC is the only accepted currency.
+        Settlement wallets are public on Basescan — you can verify every payment.
+      </p>
+      <ul>
+        <li>
+          Microservices (13 services):{' '}
+          <a
+            href="https://basescan.org/address/0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC#tokentxns"
+            target="_blank" rel="noopener"
+          >
+            0x1C68…B3bC
+          </a>
+        </li>
+        <li>
+          Molt Swarm (3 services):{' '}
+          <a
+            href="https://basescan.org/address/0x61F2eF18ab0630912D24Fd0A30288619735AfFf5#tokentxns"
+            target="_blank" rel="noopener"
+          >
+            0x61F2…AfFf5
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Charge-on-failure protection</h2>
+      <p>
+        Payment only settles when the service returns HTTP 2xx with non-empty content. If the call
+        fails for any reason (timeout, HTTP error, JS crash, empty response), the x402 SDK does not
+        settle payment. This was patched across the full fleet on 2026-05-07 — the v1.0.0 bug
+        (settling on any non-5xx) is fixed.
+      </p>
+    </section>
+
+    <div class="doc-nav-bottom">
+      <a href="/docs/compare">Next: Comparison vs alternatives →</a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+.doc-page { padding-top: 4rem; padding-bottom: 4rem; max-width: 720px; }
+.doc-header { margin-bottom: 3rem; }
+.doc-nav-link { font-size: 13px; color: var(--text-3); margin-bottom: 1rem; display: block; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.doc-sub { color: var(--text-2); font-size: 15px; }
+section { margin-bottom: 2.5rem; }
+section h2 { font-size: 1.125rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+section p { font-size: 14px; color: var(--text-2); line-height: 1.7; margin-bottom: 0.75rem; }
+section ul { list-style: disc; padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+section li { font-size: 14px; color: var(--text-2); }
+.doc-nav-bottom { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.doc-nav-bottom a { font-size: 14px; color: var(--accent); }
+</style>

@@ -1,0 +1,515 @@
+---
+import Layout from '../components/Layout.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import SchemaOrg from '../components/SchemaOrg.astro';
+import { services } from '../data/services';
+---
+
+<Layout
+  title="melis x402 Tools — Boring infrastructure for AI agents"
+  description="16 pay-per-call x402 utility APIs for AI agents. Scrape, validate, notify, convert, synthesise. No accounts, no API keys. Pay per call in USDC on Base."
+>
+  <Fragment slot="head">
+    <SchemaOrg type="landing" />
+  </Fragment>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="badge badge-teal">x402 Protocol</span>
+        <span class="badge badge-gold">USDC on Base</span>
+        <span class="badge badge-purple">MCP-native</span>
+      </div>
+
+      <h1>Boring infrastructure<br />for AI agents.</h1>
+      <p class="hero-sub">
+        16 pay-per-call utility APIs. No accounts. No API keys. No subscriptions.<br />
+        Pay per call in USDC on Base via the x402 protocol.
+      </p>
+
+      <ul class="hero-bullets">
+        <li>
+          <span class="bullet-icon">⬡</span>
+          <span>
+            <strong>Charge-on-failure-safe fleet.</strong> Payment only settles on successful 2xx + non-empty content.
+            Robots.txt enforced. SSRF-hardened across all 16 services.
+          </span>
+        </li>
+        <li>
+          <span class="bullet-icon">⬡</span>
+          <span>
+            <strong>Composes naturally.</strong> Each service is a building block: scrape → clean → guard → validate → notify.
+            Canonical workflows in the <a href="/compose">Compose</a> guide.
+          </span>
+        </li>
+        <li>
+          <span class="bullet-icon">⬡</span>
+          <span>
+            <strong>One install.</strong> <code>npx @melis-ai/x402-tools-mcp</code> gives any MCP-aware agent
+            access to the full catalogue.
+          </span>
+        </li>
+      </ul>
+
+      <div class="hero-cta">
+        <a
+          href="https://www.npmjs.com/package/@melis-ai/x402-tools-mcp"
+          class="btn-primary"
+          target="_blank"
+          rel="noopener"
+        >
+          npm install →
+        </a>
+        <a href="/docs/install-mcp" class="btn-secondary">MCP setup guide</a>
+        <a href="/pricing" class="btn-secondary">View pricing</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service grid -->
+  <section class="services-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>16 services. Zero subscriptions.</h2>
+        <p>Each call is a discrete payment. Your agent pays only for what it uses.</p>
+      </div>
+
+      <div class="service-grid">
+        {services.map((s) => <ServiceCard service={s} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Composition recipes -->
+  <section class="compose-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Services that compose.</h2>
+        <p>Three canonical workflows used in production by OpenClaw agents.</p>
+      </div>
+
+      <div class="recipe-grid">
+        <div class="recipe-card">
+          <h3>Safe research workflow</h3>
+          <p>Screen input → scrape the page → clean for LLM → validate output schema.</p>
+          <div class="recipe-flow">
+            <span>PromptGuard</span>
+            <span class="arrow">→</span>
+            <span>ScrapePay</span>
+            <span class="arrow">→</span>
+            <span>MarkdownOpt</span>
+            <span class="arrow">→</span>
+            <span>SchemaGate</span>
+          </div>
+          <div class="recipe-cost">Typical cost: $0.018 per run</div>
+          <pre><code>{`import { McpClient } from "@modelcontextprotocol/sdk/client";
+// assuming x402-tools-mcp is configured in your MCP client
+
+const guard = await client.callTool("promptguard", {
+  prompt: userInput,
+  sensitivity: "medium",
+});
+if (!guard.safe) throw new Error("Rejected: " + guard.risk);
+
+const page = await client.callTool("scrapepay", {
+  url: targetUrl, format: "html",
+});
+
+const md = await client.callTool("markdownopt", {
+  html: page.content,
+});
+
+const check = await client.callTool("schemagate", {
+  response: llmOutput,
+  schema: expectedSchema,
+});
+if (!check.valid) throw new Error(check.hint);`}</code></pre>
+          <a href="/compose#safe-research" class="recipe-link">Full workflow →</a>
+        </div>
+
+        <div class="recipe-card">
+          <h3>Notification pipeline</h3>
+          <p>Scrape a page → extract structured data → send alert when condition is met.</p>
+          <div class="recipe-flow">
+            <span>ScrapePay</span>
+            <span class="arrow">→</span>
+            <span>StructExtract</span>
+            <span class="arrow">→</span>
+            <span>NotifyRelay</span>
+          </div>
+          <div class="recipe-cost">Typical cost: $0.014 per run</div>
+          <pre><code>{`const page = await client.callTool("scrapepay", {
+  url: "https://example.com/listings",
+  format: "html",
+});
+
+const data = await client.callTool("structextract", {
+  html: page.content,
+  extract: ["tables", "links"],
+});
+
+if (data.tables[0].rows.length > previousCount) {
+  await client.callTool("notifyrelay_telegram", {
+    chat_id: CHAT_ID,
+    message: \`🆕 \${data.tables[0].rows.length} listings found\`,
+  });
+}`}</code></pre>
+          <a href="/compose#notification" class="recipe-link">Full workflow →</a>
+        </div>
+
+        <div class="recipe-card">
+          <h3>Document generation workflow</h3>
+          <p>Fetch content → clean it → convert to PDF → deliver by email.</p>
+          <div class="recipe-flow">
+            <span>ScrapePay</span>
+            <span class="arrow">→</span>
+            <span>MarkdownOpt</span>
+            <span class="arrow">→</span>
+            <span>DocConvert-PDF</span>
+            <span class="arrow">→</span>
+            <span>NotifyRelay /email</span>
+          </div>
+          <div class="recipe-cost">Typical cost: $0.025 per run</div>
+          <pre><code>{`const page = await client.callTool("scrapepay", {
+  url: reportUrl, format: "html",
+});
+
+const md = await client.callTool("markdownopt", {
+  html: page.content,
+});
+
+const pdf = await client.callTool("docconvert_pdf", {
+  from: "md", to: "pdf", content: md.markdown,
+});
+
+await client.callTool("notifyrelay_email", {
+  to: userEmail,
+  subject: "Your report",
+  body: "PDF attached: [base64]" + pdf.content,
+});`}</code></pre>
+          <a href="/compose#document" class="recipe-link">Full workflow →</a>
+        </div>
+      </div>
+
+      <div class="compose-cta">
+        <a href="/compose" class="btn-secondary">See all composition recipes →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transparency strip -->
+  <section class="transparency-section">
+    <div class="container">
+      <h2>Transparent by default.</h2>
+      <div class="transparency-grid">
+        <div class="trans-item">
+          <span class="trans-label">Settlement wallet</span>
+          <a
+            href="https://basescan.org/address/0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC#tokentxns"
+            class="trans-value mono"
+            target="_blank" rel="noopener"
+          >
+            0x1C68…B3bC
+          </a>
+          <span class="trans-note">All 13 core x402 microservices</span>
+        </div>
+        <div class="trans-item">
+          <span class="trans-label">Molt Swarm wallet</span>
+          <a
+            href="https://basescan.org/address/0x61F2eF18ab0630912D24Fd0A30288619735AfFf5#tokentxns"
+            class="trans-value mono"
+            target="_blank" rel="noopener"
+          >
+            0x61F2…AfFf5
+          </a>
+          <span class="trans-note">Web Synthesise, Screenshot, PDF Render</span>
+        </div>
+        <div class="trans-item">
+          <span class="trans-label">Protocol</span>
+          <a href="https://x402.org" class="trans-value" target="_blank" rel="noopener">
+            x402 (Linux Foundation)
+          </a>
+          <span class="trans-note">Open spec. Google, AWS, Stripe, Visa, Mastercard co-signed.</span>
+        </div>
+        <div class="trans-item">
+          <span class="trans-label">Settlement chain</span>
+          <span class="trans-value">Base (Coinbase L2)</span>
+          <span class="trans-note">~2 second finality. USDC only.</span>
+        </div>
+        <div class="trans-item">
+          <span class="trans-label">Fleet status</span>
+          <span class="trans-value status-green">14 green / 0 red</span>
+          <span class="trans-note">Last audited 2026-05-07</span>
+        </div>
+        <div class="trans-item">
+          <span class="trans-label">MCP package</span>
+          <a
+            href="https://www.npmjs.com/package/@melis-ai/x402-tools-mcp"
+            class="trans-value"
+            target="_blank" rel="noopener"
+          >
+            @melis-ai/x402-tools-mcp
+          </a>
+          <span class="trans-note">Open-source wrapper. MIT license.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+/* Hero */
+.hero {
+  padding: 6rem 0 4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-badge {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
+.hero-sub {
+  font-size: 1.125rem;
+  color: var(--text-2);
+  max-width: 600px;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+.hero-bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-width: 640px;
+  margin-bottom: 2.5rem;
+}
+
+.hero-bullets li {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.bullet-icon {
+  color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  text-decoration: none;
+  color: white;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.2);
+  background: var(--surface-hover);
+  text-decoration: none;
+  color: var(--text);
+}
+
+/* Service grid */
+.services-section {
+  padding: 5rem 0;
+}
+
+.section-header {
+  margin-bottom: 2.5rem;
+}
+
+.section-header h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-header p {
+  color: var(--text-2);
+  font-size: 15px;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* Compose */
+.compose-section {
+  padding: 5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.recipe-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recipe-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.recipe-card > p {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.recipe-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.recipe-flow span {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--teal);
+}
+
+.arrow {
+  background: none !important;
+  border: none !important;
+  color: var(--text-3) !important;
+  padding: 0 !important;
+}
+
+.recipe-cost {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--gold);
+}
+
+.recipe-card pre {
+  font-size: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.recipe-link {
+  font-size: 12px;
+  color: var(--accent);
+  margin-top: auto;
+}
+
+.compose-cta {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+/* Transparency */
+.transparency-section {
+  padding: 5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.transparency-section h2 {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.transparency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.trans-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trans-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+}
+
+.trans-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.trans-value.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--teal);
+}
+
+.status-green {
+  color: #6FD08C;
+}
+
+.trans-note {
+  font-size: 12px;
+  color: var(--text-3);
+}
+</style>

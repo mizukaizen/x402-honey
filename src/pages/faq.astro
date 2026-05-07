@@ -1,0 +1,294 @@
+---
+import Layout from '../components/Layout.astro';
+---
+
+<Layout
+  title="FAQ"
+  description="Frequently asked questions about melis x402 tools. What is x402? What is MCP? How does payment work? Comparison with Orbis, Exa, StableEnrich, and others."
+>
+  <div class="container" style="padding-top:4rem;padding-bottom:4rem;">
+    <h1>FAQ</h1>
+    <p class="subtitle">The questions agents and their builders ask most often.</p>
+
+    <div class="faq-grid">
+
+      <div class="faq-section">
+        <h2>The protocol</h2>
+
+        <div class="faq-item">
+          <h3>What is x402?</h3>
+          <p>
+            x402 is an open payment protocol for machine-to-machine micropayments. When a service requires
+            payment, it returns HTTP 402 (Payment Required) with a signed payment quote. Your wallet client
+            signs the payment in USDC on Base and retries the request. The service verifies the payment
+            header and returns the result. No accounts, no API keys, no subscriptions.
+          </p>
+          <p>
+            x402 joined the Linux Foundation in April 2026 with Google, AWS, Microsoft, Stripe, Visa,
+            Mastercard, and 20+ other founding members. It is now the dominant micropayment protocol for
+            AI agents. See <a href="https://x402.org" target="_blank" rel="noopener">x402.org</a> for the spec.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What is MCP?</h3>
+          <p>
+            MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic.
+            It lets AI agents call external tools as functions. With the melis x402 Tools MCP server
+            (<code>npx @melis-ai/x402-tools-mcp</code>), all 16 services become callable tools in any
+            MCP-aware agent environment — Claude Desktop, Cursor, Claude Code, Continue, and others.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>How does my agent pay?</h3>
+          <p>
+            Your agent's x402-enabled wallet client handles payment automatically. When a service returns
+            402, the client signs a USDC payment on Base and retries. If you're integrating directly via
+            HTTP, you'll need an x402 client library. If you're using the MCP server, payment handling
+            depends on your MCP client's x402 support — some clients handle it natively, others require
+            the <code>X402_PAYMENT_HEADER</code> environment variable pre-populated from your wallet.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What happens if a call fails?</h3>
+          <p>
+            Payment is not settled on failure. This is enforced at the SDK level across all 16 services.
+            If the service returns anything other than HTTP 2xx with non-empty content, the x402 SDK
+            does not settle the payment. This was a known bug in v1.0.0 (charge-on-failure was incorrectly
+            triggered on any non-5xx, including 4xx errors). It was patched and the full fleet was rebuilt
+            on 2026-05-07.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Is x402 the same as Stripe MPP?</h3>
+          <p>
+            No. Stripe MPP (March 2026) sits one layer above x402 in the stack — it's a higher-level
+            abstraction for agentic payments with enterprise partners (Anthropic, OpenAI, DoorDash, Visa,
+            Shopify, etc.). x402 is the lower-level protocol for direct HTTP micropayments. The two are
+            described as complementary, not competing. x402 is what melis services use.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>Using the services</h2>
+
+        <div class="faq-item">
+          <h3>Do I need an account?</h3>
+          <p>
+            No. x402 is account-less. If you're testing with an issued internal key, we provide that
+            directly — no signup flow. For production x402 payments, your wallet is your identity.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Is there a free tier?</h3>
+          <p>
+            No free tier. Every call is paid. The prices start at $0.001 USDC — $1 buys you 1,000 schema
+            validation calls. The model is intentionally simple: you pay for what you use, nothing else.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Can I get a refund?</h3>
+          <p>
+            Charge-on-failure-safe means you shouldn't need one — failed calls don't settle. If you
+            believe you were charged for a call that failed, email sean@melis.ai with the transaction
+            hash. A manual review will be conducted. The only confirmed past incident was tx
+            <code>0x46e6edbc…</code> (ScrapePay v1.0.0, 2026-05-07) — the recipient was identified and
+            a refund is pending.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Are there per-IP or per-call limits?</h3>
+          <p>
+            NotifyRelay is rate-limited at 10 requests per minute per IP (enforced via
+            express-rate-limit, HTTP 429 on breach). Screenshot and PDF Render have per-IP daily limits
+            (contact sean@melis.ai for details). The other 13 services have no published rate limit.
+            For bulk volume (&gt;10,000 calls/month), email to arrange an internal key with monthly
+            invoicing.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What chains and currencies are supported?</h3>
+          <p>
+            USDC on Base only. Base is Coinbase's Ethereum L2 — fast finality (~2 seconds), low gas.
+            Other chains and currencies are not currently supported.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>Comparisons</h2>
+
+        <div class="faq-item">
+          <h3>How is this different from Orbis?</h3>
+          <p>
+            Orbis is an aggregator — it bundles thousands of services into a single marketplace. Useful
+            for breadth. melis x402 Tools is a curated set of 16 services, each security-audited, with
+            charge-on-failure safety, SSRF hardening, and robots.txt enforcement. Orbis handles volume
+            (40,800 calls/24h); melis handles correctness and safety for boring infrastructure tasks.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>How is this different from StableEnrich?</h3>
+          <p>
+            StableEnrich bundles Apollo, Clado, Exa, Firecrawl, Maps, Serper, Whitepages, and others —
+            primarily data enrichment and research services. melis x402 Tools focuses on utility
+            primitives: scrape, validate, convert, notify, guard. The overlap is ScrapePay vs Firecrawl.
+            ScrapePay enforces robots.txt and charge-on-failure; Firecrawl does not guarantee both.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>How is this different from Exa?</h3>
+          <p>
+            Exa is a neural search engine over a proprietary indexed corpus. Great for broad research
+            and finding semantically similar documents. ScrapePay fetches the live web page via
+            Playwright — better for dynamic JS-rendered content, very fresh information, or pages Exa
+            hasn't indexed. Exa requires a subscription; ScrapePay is $0.01 per call with no account.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>How is this different from BlockRun?</h3>
+          <p>
+            BlockRun is an x402 AI model gateway — access to 55+ LLMs via x402. melis x402 Tools is
+            for utility infrastructure around LLM calls (scraping, validating, converting, notifying) —
+            not the models themselves. The two are complementary, not competing.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>How is this different from agentsvc.io?</h3>
+          <p>
+            agentsvc.io offers 20 utility tools at similar price points ($0.001–$0.008). The overlap
+            is real. melis x402 Tools differentiates on security hardening (SSRF protection, robots.txt
+            enforcement, charge-on-failure), composition documentation, and the MCP wrapper that gives
+            one-command access to all 16 services.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>Security and transparency</h2>
+
+        <div class="faq-item">
+          <h3>Where is the source code?</h3>
+          <p>
+            Service code is closed-source. The MCP wrapper is open-source (MIT):{' '}
+            <a href="https://github.com/mizukaizen/x402-tools-mcp" target="_blank" rel="noopener">
+              github.com/mizukaizen/x402-tools-mcp
+            </a>.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>How do I verify payments are going where you say?</h3>
+          <p>
+            Every payment settles on-chain. The microservices wallet (13 services) is{' '}
+            <a
+              href="https://basescan.org/address/0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC#tokentxns"
+              target="_blank" rel="noopener"
+            >
+              0x1C68…B3bC on Basescan
+            </a>.
+            The Molt Swarm wallet (3 services) is{' '}
+            <a
+              href="https://basescan.org/address/0x61F2eF18ab0630912D24Fd0A30288619735AfFf5#tokentxns"
+              target="_blank" rel="noopener"
+            >
+              0x61F2…AfFf5 on Basescan
+            </a>.
+            Both wallets are publicly viewable.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What is the SSRF hardening you mention?</h3>
+          <p>
+            Server-Side Request Forgery (SSRF) is a class of attack where a user tricks a server into
+            making requests to internal network addresses (e.g. <code>http://169.254.169.254/</code> to
+            retrieve cloud metadata, or <code>http://127.0.0.1:3011/</code> to reach internal services).
+            All services that accept user-supplied URLs (ScrapePay, CacheServe, LinkRisk, LinkSafe,
+            NotifyRelay /webhook, Screenshot, PDF Render) resolve the hostname via DNS before making
+            any request, and block private IP ranges (127.x, 10.x, 172.16–31.x, 192.168.x, 169.254.x)
+            and non-http/https schemes. A full security audit was conducted on 2026-05-07; all 4 critical
+            findings were closed in the same session.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Who built this?</h3>
+          <p>
+            Sean Melis (sean@melis.ai) — AI agent operator and builder based in Australia. Runs
+            OpenClaw multi-agent system and Polymarket trading bots on a dedicated Helsinki VPS. The
+            x402 services are part of the infrastructure stack built to power those agents, opened to
+            the public as x402-priced utilities.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What happens if a service is down?</h3>
+          <p>
+            Services return an appropriate HTTP error code. If the service is unreachable, your x402
+            client will not settle payment (no 2xx response). Last known fleet status: 14 green / 0 red
+            as of 2026-05-07. No SLA is published currently.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</Layout>
+
+<style>
+h1 { font-size: 2rem; margin-bottom: 0.75rem; }
+.subtitle { color: var(--text-2); margin-bottom: 3rem; }
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  gap: 3rem;
+  align-items: start;
+}
+
+.faq-section h2 {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.faq-item {
+  margin-bottom: 1.5rem;
+}
+
+.faq-item h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.faq-item p {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .faq-grid { grid-template-columns: 1fr; }
+}
+</style>

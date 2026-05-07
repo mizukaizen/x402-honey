@@ -1,0 +1,73 @@
+---
+import type { Service } from '../data/services';
+import { WALLETS } from '../data/services';
+
+interface Props {
+  service?: Service;
+  type?: 'landing' | 'service';
+}
+
+const { service, type = 'landing' } = Astro.props;
+---
+
+{type === 'landing' && (
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Melis AI",
+        "url": "https://melis.ai",
+        "sameAs": [
+          "https://agents.melis.ai",
+          "https://www.npmjs.com/package/@melis-ai/x402-tools-mcp"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "sean@melis.ai",
+          "contactType": "customer support"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "url": "https://agents.melis.ai",
+        "name": "melis x402 Tools",
+        "description": "16 pay-per-call x402 utility APIs for AI agents. No accounts, no API keys. Pay in USDC on Base.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Melis AI"
+        }
+      }
+    ]
+  })} />
+)}
+
+{type === 'service' && service && (
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": service.name,
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "API",
+    "operatingSystem": "any",
+    "description": service.description,
+    "offers": {
+      "@type": "Offer",
+      "price": service.price.toFixed(3),
+      "priceCurrency": "USDC",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": service.price.toFixed(3),
+        "priceCurrency": "USDC",
+        "unitText": "per call"
+      }
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "Melis AI",
+      "url": "https://melis.ai"
+    },
+    "url": `https://agents.melis.ai/services/${service.slug}`,
+    "sameAs": service.endpoint
+  })} />
+)}

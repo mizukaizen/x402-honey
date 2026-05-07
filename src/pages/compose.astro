@@ -1,0 +1,345 @@
+---
+import Layout from '../components/Layout.astro';
+---
+
+<Layout
+  title="Compose — Canonical Agent Workflows"
+  description="Canonical agent workflow compositions using melis x402 tools. Safe research, notification pipeline, document generation. Code examples and cost breakdowns."
+>
+  <div class="container" style="padding-top:4rem;padding-bottom:4rem;">
+    <h1>Compose</h1>
+    <p class="subtitle">
+      Each service is a building block. These are the canonical compositions used in production
+      by OpenClaw agents on Helsinki.
+    </p>
+
+    <!-- Recipe 1 -->
+    <section id="safe-research" class="recipe">
+      <h2>Safe research workflow</h2>
+      <p class="recipe-desc">
+        The canonical pattern for any agent that accepts user-provided URLs or queries.
+        Screen untrusted input → risk-check the URL → scrape → clean for LLM → validate output.
+      </p>
+
+      <div class="mermaid-wrap">
+        <pre class="flow-diagram">
+PromptGuard ($0.002) → LinkRisk ($0.005) → ScrapePay ($0.010) → MarkdownOpt ($0.005) → SchemaGate ($0.001)
+        </pre>
+        <p class="cost-line">Total cost per run: $0.023 USDC</p>
+      </div>
+
+      <pre><code>{`import { McpClient } from "@modelcontextprotocol/sdk/client";
+
+async function safeResearch(userQuery: string, targetUrl: string, schema: object) {
+  // 1. Screen the user input for prompt injection
+  const guard = await mcp.callTool("promptguard", {
+    prompt: userQuery,
+    sensitivity: "medium",
+  });
+  if (!guard.safe) throw new Error(\`Input rejected: \${guard.risk}\`);
+
+  // 2. Risk-check the URL before visiting
+  const risk = await mcp.callTool("linkrisk", { url: targetUrl });
+  if (risk.risk_level === "high") throw new Error(\`URL blocked: \${risk.flags.join(", ")}\`);
+
+  // 3. Scrape the page
+  const page = await mcp.callTool("scrapepay", {
+    url: targetUrl,
+    format: "html",
+  });
+
+  // 4. Clean the HTML to markdown for the LLM
+  const clean = await mcp.callTool("markdownopt", { html: page.content });
+
+  // 5. Call your LLM with the clean content
+  const llmOutput = await callLLM(userQuery, clean.markdown);
+
+  // 6. Validate the LLM output matches your expected schema
+  const valid = await mcp.callTool("schemagate", {
+    response: JSON.stringify(llmOutput),
+    schema,
+  });
+  if (!valid.valid) throw new Error(\`LLM output invalid: \${valid.hint}\`);
+
+  return llmOutput;
+}`}</code></pre>
+
+      <div class="why-block">
+        <h3>Why this specific composition?</h3>
+        <p>
+          PromptGuard prevents jailbreak-style inputs from reaching your scraper or LLM.
+          LinkRisk is cheap ($0.005) and catches obviously dangerous URLs before spending $0.01 on ScrapePay.
+          MarkdownOpt's ~70% token reduction pays for itself on the first LLM call.
+          SchemaGate catches hallucinated fields before they propagate downstream.
+        </p>
+      </div>
+    </section>
+
+    <!-- Recipe 2 -->
+    <section id="notification" class="recipe">
+      <h2>Notification pipeline</h2>
+      <p class="recipe-desc">
+        Monitor a page for changes, extract structured data, and alert when conditions are met.
+        Works with any Telegram chat or public webhook endpoint.
+      </p>
+
+      <div class="mermaid-wrap">
+        <pre class="flow-diagram">
+ScrapePay ($0.010) → StructExtract ($0.002) → [condition check] → NotifyRelay /notify ($0.002)
+        </pre>
+        <p class="cost-line">Total cost per triggered alert: $0.014 USDC</p>
+      </div>
+
+      <pre><code>{`async function monitorAndNotify(
+  pageUrl: string,
+  chatId: string,
+  previousCount: number
+) {
+  // 1. Scrape the page as HTML for structured extraction
+  const page = await mcp.callTool("scrapepay", {
+    url: pageUrl,
+    format: "html",
+  });
+
+  // 2. Extract structured tables from the HTML
+  const data = await mcp.callTool("structextract", {
+    html: page.content,
+    extract: ["tables", "links"],
+  });
+
+  const currentCount = data.tables[0]?.rows.length ?? 0;
+
+  // 3. Only notify if something changed
+  if (currentCount > previousCount) {
+    await mcp.callTool("notifyrelay_telegram", {
+      chat_id: chatId,
+      message: [
+        \`🆕 *\${currentCount} items* found (was \${previousCount})\`,
+        \`Page: \${pageUrl}\`,
+      ].join("\\n"),
+    });
+    return currentCount;
+  }
+
+  return previousCount;
+}`}</code></pre>
+
+      <div class="why-block">
+        <h3>Why StructExtract before LLM?</h3>
+        <p>
+          Raw HTML from ScrapePay includes nav, ads, and boilerplate. Passing it to an LLM
+          to count table rows costs 10–20× more in tokens than using StructExtract first.
+          StructExtract costs $0.002 and returns clean, typed JSON. The LLM only sees what matters.
+        </p>
+      </div>
+    </section>
+
+    <!-- Recipe 3 -->
+    <section id="document" class="recipe">
+      <h2>Document generation workflow</h2>
+      <p class="recipe-desc">
+        Fetch a web page, clean it to markdown, generate a PDF, and deliver it by email.
+        Useful for report generation, document archival, and content delivery agents.
+      </p>
+
+      <div class="mermaid-wrap">
+        <pre class="flow-diagram">
+ScrapePay ($0.010) → MarkdownOpt ($0.005) → DocConvert-PDF ($0.005) → NotifyRelay /email ($0.005)
+        </pre>
+        <p class="cost-line">Total cost per document delivered: $0.025 USDC</p>
+      </div>
+
+      <pre><code>{`async function generateAndDeliverReport(
+  reportUrl: string,
+  recipientEmail: string,
+  subject: string
+) {
+  // 1. Fetch the live page
+  const page = await mcp.callTool("scrapepay", {
+    url: reportUrl,
+    format: "html",
+  });
+
+  // 2. Clean to markdown (removes nav, ads, etc.)
+  const clean = await mcp.callTool("markdownopt", { html: page.content });
+
+  // 3. Convert markdown to PDF
+  const pdf = await mcp.callTool("docconvert_pdf", {
+    from: "md",
+    to: "pdf",
+    content: clean.markdown,
+  });
+
+  // 4. Email the PDF
+  await mcp.callTool("notifyrelay_email", {
+    to: recipientEmail,
+    subject,
+    body: \`Report generated from \${reportUrl}\\n\\n[PDF attached — base64 below]\\n\${pdf.content}\`,
+  });
+
+  return {
+    pages: "(see PDF)",
+    token_reduction: clean.reduction_pct,
+    size_bytes: pdf.size_bytes,
+  };
+}`}</code></pre>
+    </section>
+
+    <!-- Recipe 4 -->
+    <section id="url-verification" class="recipe">
+      <h2>URL verification pipeline</h2>
+      <p class="recipe-desc">
+        Fast and authoritative URL safety checking for agents that handle user-supplied links.
+        Start cheap, escalate to full sandbox only when needed.
+      </p>
+
+      <div class="mermaid-wrap">
+        <pre class="flow-diagram">
+LinkRisk ($0.005) → [if medium+] → LinkSafe ($0.010)
+        </pre>
+        <p class="cost-line">Cost: $0.005 for clean URLs, $0.015 for suspicious ones</p>
+      </div>
+
+      <pre><code>{`async function verifyUrl(url: string) {
+  // Fast heuristic check first
+  const risk = await mcp.callTool("linkrisk", { url });
+
+  if (risk.risk_level === "high") {
+    return { safe: false, verdict: "blocked by heuristic", flags: risk.flags };
+  }
+
+  if (risk.risk_level === "medium") {
+    // Escalate to full Playwright sandbox + VirusTotal
+    const safe = await mcp.callTool("linksafe", { url });
+    return {
+      safe: safe.safe,
+      verdict: safe.safe ? "clean" : "threat detected",
+      threats: safe.threats,
+      virustotal_positives: safe.virustotal_positives,
+    };
+  }
+
+  return { safe: true, verdict: "clean (heuristic)", flags: risk.flags };
+}`}</code></pre>
+    </section>
+
+    <!-- Recipe 5 -->
+    <section id="cache-and-convert" class="recipe">
+      <h2>Cache and convert workflow</h2>
+      <p class="recipe-desc">
+        For multi-agent pipelines where several agents may need the same page.
+        Cache at the session level, extract and convert once.
+      </p>
+
+      <div class="mermaid-wrap">
+        <pre class="flow-diagram">
+CacheServe ($0.001) → StructExtract ($0.002) → DocConvert-Text ($0.001)
+        </pre>
+        <p class="cost-line">Total cost: $0.004 per session (even if 10 agents need the same page)</p>
+      </div>
+
+      <pre><code>{`async function cachedFetchAndConvert(url: string) {
+  // Fetch with 1-hour cache — subsequent calls return the cached version
+  const cached = await mcp.callTool("cacheserve", {
+    url,
+    ttl_seconds: 3600,
+  });
+
+  if (cached.cached) {
+    console.log(\`Cache hit from \${cached.cached_at}\`);
+  }
+
+  // Extract tables and emails from the HTML
+  const structured = await mcp.callTool("structextract", {
+    html: cached.content,
+    extract: ["tables", "emails", "links"],
+  });
+
+  // Convert the tables to CSV for a spreadsheet agent
+  if (structured.tables.length > 0) {
+    const csv = await mcp.callTool("docconvert_text", {
+      from: "json",
+      to: "csv",
+      content: JSON.stringify(structured.tables[0]),
+    });
+    return csv.content;
+  }
+
+  return structured;
+}`}</code></pre>
+    </section>
+  </div>
+</Layout>
+
+<style>
+h1 { font-size: 2rem; margin-bottom: 0.75rem; }
+.subtitle { color: var(--text-2); max-width: 640px; margin-bottom: 3rem; line-height: 1.7; }
+
+.recipe {
+  margin-bottom: 4rem;
+  padding-bottom: 4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.recipe:last-child {
+  border-bottom: none;
+}
+
+.recipe h2 {
+  font-size: 1.375rem;
+  margin-bottom: 0.75rem;
+}
+
+.recipe-desc {
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 640px;
+  margin-bottom: 1.5rem;
+}
+
+.mermaid-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.flow-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--teal);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.cost-line {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gold);
+  margin-top: 0.5rem;
+}
+
+.why-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.why-block h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-2);
+}
+
+.why-block p {
+  font-size: 13px;
+  color: var(--text-3);
+  line-height: 1.7;
+}
+</style>

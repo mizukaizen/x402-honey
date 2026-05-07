@@ -1,0 +1,267 @@
+/* ── Tokens ──────────────────────────────────────────────────────────────── */
+:root {
+  --bg:              #0A0A0A;
+  --surface:         #141414;
+  --surface-2:       #1E1E1E;
+  --surface-hover:   #252525;
+
+  --border:          rgba(255,255,255,0.07);
+  --border-light:    rgba(255,255,255,0.04);
+
+  --text:            #E5E7EB;
+  --text-2:          #9CA3AF;
+  --text-3:          #6B7280;
+
+  --accent:          #a855f7;
+  --accent-hover:    #c084fc;
+  --teal:            #5EEAD4;
+  --gold:            #C4943A;
+
+  --accent-subtle:   rgba(168,85,247,0.10);
+  --teal-subtle:     rgba(94,234,212,0.10);
+  --gold-subtle:     rgba(196,148,58,0.10);
+
+  --font-body:       'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+
+  --radius-sm:       4px;
+  --radius:          8px;
+  --radius-lg:       12px;
+
+  --max-w:           1100px;
+  --nav-h:           56px;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+pre {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+code:not(pre code) {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-size: 0.875em;
+  color: var(--teal);
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+.nav {
+  height: var(--nav-h);
+  border-bottom: 1px solid var(--border);
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.nav-logo {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.nav-logo:hover { text-decoration: none; color: var(--text); }
+
+.nav-logo .bee {
+  color: var(--gold);
+  font-size: 16px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 13px;
+  color: var(--text-2);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-links .cta {
+  background: var(--accent);
+  color: white;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.nav-links .cta:hover {
+  background: var(--accent-hover);
+  color: white;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  margin-top: 5rem;
+}
+
+.footer-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.footer-brand {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.footer-brand p {
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.footer-group h4 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+  margin-bottom: 0.75rem;
+}
+
+.footer-group ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-group a {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.footer-group a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* ── Utility ─────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+}
+
+.badge-gold {
+  color: var(--gold);
+  border-color: rgba(196,148,58,0.35);
+  background: var(--gold-subtle);
+}
+
+.badge-teal {
+  color: var(--teal);
+  border-color: rgba(94,234,212,0.25);
+  background: var(--teal-subtle);
+}
+
+.badge-purple {
+  color: var(--accent);
+  border-color: rgba(168,85,247,0.25);
+  background: var(--accent-subtle);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .nav-links .hide-mobile { display: none; }
+  html { font-size: 14px; }
+}

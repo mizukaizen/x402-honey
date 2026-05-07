@@ -1,0 +1,88 @@
+---
+import type { Service } from '../data/services';
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+
+const categoryColour: Record<string, string> = {
+  web:      'teal',
+  safety:   'purple',
+  notify:   'gold',
+  convert:  'gold',
+  validate: 'purple',
+};
+
+const colour = categoryColour[service.category] ?? 'teal';
+---
+
+<a href={`/services/${service.slug}`} class="service-card">
+  <div class="service-card-header">
+    <span class={`badge badge-${colour}`}>{service.category}</span>
+    <span class="service-price">{service.priceLabel} <span>USDC</span></span>
+  </div>
+  <h3>{service.name}</h3>
+  <p>{service.tagline}</p>
+  <span class="service-card-cta">View →</span>
+</a>
+
+<style>
+.service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.service-card:hover {
+  border-color: rgba(168,85,247,0.3);
+  background: var(--surface-hover);
+  text-decoration: none;
+}
+
+.service-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.service-price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--teal);
+}
+
+.service-price span {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+p {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.service-card-cta {
+  font-size: 12px;
+  color: var(--accent);
+  margin-top: 0.5rem;
+}
+</style>
