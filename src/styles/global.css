@@ -10,7 +10,7 @@
 
   --text:            #E5E7EB;
   --text-2:          #9CA3AF;
-  --text-3:          #6B7280;
+  --text-3:          #888888;
 
   --accent:          #a855f7;
   --accent-hover:    #c084fc;
@@ -266,7 +266,7 @@ code:not(pre code) {
 }
 
 .badge-purple {
-  color: var(--accent);
+  color: #c084fc;
   border-color: rgba(168,85,247,0.25);
   background: var(--accent-subtle);
 }
