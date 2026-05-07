@@ -1,11 +1,32 @@
 ---
 import Layout from '../components/Layout.astro';
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is x402?", "acceptedAnswer": { "@type": "Answer", "text": "x402 is an open payment protocol for machine-to-machine micropayments. When a service requires payment, it returns HTTP 402 (Payment Required) with a signed payment quote. Your wallet client signs the payment in USDC on Base and retries the request. No accounts, no API keys, no subscriptions." } },
+    { "@type": "Question", "name": "What is MCP?", "acceptedAnswer": { "@type": "Answer", "text": "MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic. It lets AI agents call external tools as functions. With npx @melis-ai/x402-tools-mcp, all 16 services become callable tools in any MCP-aware agent environment." } },
+    { "@type": "Question", "name": "How does my agent pay?", "acceptedAnswer": { "@type": "Answer", "text": "Your agent's x402-enabled wallet client handles payment automatically. When a service returns 402, the client signs a USDC payment on Base and retries. Payment only settles on successful 2xx response with non-empty content." } },
+    { "@type": "Question", "name": "Do I need an account?", "acceptedAnswer": { "@type": "Answer", "text": "No. x402 is account-less. Your wallet is your identity. No registration, no API key, no subscription required." } },
+    { "@type": "Question", "name": "Is there a free tier?", "acceptedAnswer": { "@type": "Answer", "text": "No free tier. Every call is paid. Prices start at $0.001 USDC per call." } },
+    { "@type": "Question", "name": "What chains and currencies are supported?", "acceptedAnswer": { "@type": "Answer", "text": "USDC on Base only. Base is Coinbase's Ethereum L2 with fast finality (~2 seconds) and low gas costs." } },
+    { "@type": "Question", "name": "How is this different from Orbis?", "acceptedAnswer": { "@type": "Answer", "text": "Orbis is an aggregator bundling thousands of services. melis x402 Tools is a curated set of 16 services, each security-audited with charge-on-failure safety, SSRF hardening, and robots.txt enforcement." } },
+    { "@type": "Question", "name": "Where is the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Service code is closed-source for security. The MCP wrapper is open-source (MIT) at github.com/mizukaizen/x402-tools-mcp." } },
+    { "@type": "Question", "name": "What happens if a service is down?", "acceptedAnswer": { "@type": "Answer", "text": "Services return an appropriate HTTP error code. Payment is not settled on non-2xx responses, so failed calls are not charged." } },
+    { "@type": "Question", "name": "Who built this?", "acceptedAnswer": { "@type": "Answer", "text": "Sean Melis (sean@melis.ai), AI agent operator and builder based in London, UK. Part of the melis.ai agent infrastructure stack." } },
+  ],
+};
 ---
 
 <Layout
   title="FAQ"
   description="Frequently asked questions about melis x402 tools. What is x402? What is MCP? How does payment work? Comparison with Orbis, Exa, StableEnrich, and others."
+  breadcrumbs={[{ name: 'FAQ', url: 'https://agents.melis.ai/faq' }]}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
   <div class="container" style="padding-top:4rem;padding-bottom:4rem;">
     <h1>FAQ</h1>
     <p class="subtitle">The questions agents and their builders ask most often.</p>

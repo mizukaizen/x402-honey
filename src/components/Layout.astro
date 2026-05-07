@@ -6,14 +6,25 @@ interface Props {
   description: string;
   canonical?: string;
   ogImage?: string;
+  breadcrumbs?: { name: string; url: string }[];
 }
 
 const {
   title,
   description,
   canonical = Astro.url.href,
-  ogImage = 'https://agents.melis.ai/og.png',
+  ogImage = 'https://agents.melis.ai/og-hero.png',
+  breadcrumbs,
 } = Astro.props;
+
+const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "melis x402 Tools", "item": "https://agents.melis.ai" },
+    ...breadcrumbs.map((b, i) => ({ "@type": "ListItem", "position": i + 2, "name": b.name, "item": b.url })),
+  ],
+} : null;
 
 const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Tools`;
 ---
@@ -35,13 +46,20 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1600" />
+    <meta property="og:image:height" content="900" />
+    <meta property="og:image:alt" content="melis x402 Tools — boring infrastructure for AI agents" />
+    <meta property="og:site_name" content="melis x402 Tools" />
+    <meta property="og:locale" content="en_AU" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@melisarchimedes" />
+    <meta name="twitter:creator" content="@melisarchimedes" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="melis x402 Tools — boring infrastructure for AI agents" />
 
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -52,6 +70,9 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
     />
 
     <link rel="sitemap" href="/sitemap-index.xml" />
+    {breadcrumbSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+    )}
     <slot name="head" />
   </head>
   <body>
@@ -89,7 +110,7 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
       <div class="footer-inner">
         <div class="footer-brand">
           <span>✦ melis x402 tools</span>
-          <p>Boring infrastructure for AI agents.<br />Built by <a href="https://melis.ai">Sean Melis</a>. Based in Australia.</p>
+          <p>Boring infrastructure for AI agents.<br />A <a href="https://melis.ai">melis.ai</a> product · Built in London, UK.</p>
         </div>
 
         <div class="footer-links">

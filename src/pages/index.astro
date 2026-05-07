@@ -24,8 +24,8 @@ import { services } from '../data/services';
 
       <h1>Boring infrastructure<br />for AI agents.</h1>
       <p class="hero-sub">
-        16 pay-per-call utility APIs. No accounts. No API keys. No subscriptions.<br />
-        Pay per call in USDC on Base via the x402 protocol.
+        16 pay-per-call x402 utility APIs for AI agents — pay per call in USDC on Base,
+        no accounts, no API keys, no subscriptions.
       </p>
 
       <ul class="hero-bullets">
@@ -63,6 +63,18 @@ import { services } from '../data/services';
         </a>
         <a href="/docs/install-mcp" class="btn-secondary">MCP setup guide</a>
         <a href="/pricing" class="btn-secondary">View pricing</a>
+      </div>
+
+      <!-- Hero image -->
+      <div class="hero-image-wrap">
+        <img
+          src="/og-hero.png"
+          alt="Paper-craft beehive diorama — tiny worker figurines in each hexagonal chamber doing different utility tasks, representing the 16 melis x402 services"
+          width="1600"
+          height="900"
+          loading="eager"
+          decoding="async"
+        />
       </div>
     </div>
   </section>
@@ -261,8 +273,23 @@ await client.callTool("notifyrelay_email", {
 <style>
 /* Hero */
 .hero {
-  padding: 6rem 0 4rem;
+  padding: 6rem 0 0;
   border-bottom: 1px solid var(--border);
+}
+
+.hero-image-wrap {
+  margin-top: 3rem;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  opacity: 0.9;
+}
+
+.hero-image-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .hero-badge {

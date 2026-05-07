@@ -19,6 +19,10 @@ const basescanUrl = `https://basescan.org/address/${walletAddr}#tokentxns`;
 <Layout
   title={`${service.name} — ${service.priceLabel} USDC per call`}
   description={`${service.name}: ${service.tagline} ${service.priceLabel} USDC per call. No account required. Pay via x402 protocol on Base.`}
+  breadcrumbs={[
+    { name: 'Services', url: 'https://agents.melis.ai/services' },
+    { name: service.name, url: `https://agents.melis.ai/services/${service.slug}` },
+  ]}
 >
   <Fragment slot="head">
     <SchemaOrg type="service" service={service} />

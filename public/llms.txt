@@ -2,7 +2,7 @@
 
 16 pay-per-call x402 utility APIs for AI agents. USDC on Base. No accounts, no API keys, no subscriptions. Charge-on-failure-safe across the fleet.
 
-> Boring infrastructure for AI agents. Built by Sean Melis (sean@melis.ai). Based in Australia.
+> Boring infrastructure for AI agents. Built by Sean Melis (sean@melis.ai). A melis.ai product, built in London, UK.
 
 Pricing: $0.001 to $0.49 per call, paid in USDC on Base via the x402 protocol.
 Settlement: ~2 seconds on Base (Coinbase L2).
@@ -12,22 +12,22 @@ Fleet status: 14 green / 0 red (last audited 2026-05-07)
 
 ## Services
 
-- CacheServe: URL fetch with server-side caching · $0.001 · https://cacheserve.melis.ai/fetch
-- DocConvert-Text: Format conversion (md↔html, json↔csv, etc.) · $0.001 · https://docconvert-text.melis.ai/convert
-- SchemaGate: Validate LLM output against JSON Schema · $0.001 · https://schemagate.melis.ai/validate-schema
-- NotifyRelay /webhook: POST JSON to any public URL (HMAC-signed) · $0.001 · https://notify.melis.ai/webhook
-- PromptGuard: Prompt injection risk score (0–100) · $0.002 · https://promptguard.melis.ai/score
-- NotifyRelay /notify: Send Telegram message · $0.002 · https://notify.melis.ai/notify
-- StructExtract: HTML → structured JSON (tables, links, emails, phones) · $0.002 · https://structextract.melis.ai/extract
-- DocConvert-PDF: HTML or markdown → PDF (base64) · $0.005 · https://docconvert-pdf.melis.ai/convert
-- LinkRisk: Lightweight URL risk profile (heuristic) · $0.005 · https://linkrisk.melis.ai/profile
-- MarkdownOpt: URL or HTML → clean LLM-ready markdown (~70% token reduction) · $0.005 · https://markdownopt.melis.ai/markdown
-- NotifyRelay /email: Send transactional email · $0.005 · https://notify.melis.ai/email
-- LinkSafe: Definitive URL safety check (Playwright sandbox + VirusTotal) · $0.01 · https://linksafe.melis.ai/verify
-- ScrapePay: Web extraction via Playwright (robots.txt enforced, charge-on-failure-safe) · $0.01 · https://scrapepay.melis.ai/scrape
-- Screenshot: Headless Chromium PNG · $0.02 · https://molt.melis.ai/screenshot
-- Web Synthesise: Multi-source research synthesis with citations · $0.05 · https://molt.melis.ai/web/synthesise
-- PDF Render: High-fidelity URL or HTML → PDF via Playwright · $0.49 · https://molt.melis.ai/pdf/render
+- [CacheServe](https://cacheserve.melis.ai/fetch): URL fetch with server-side caching · $0.001
+- [DocConvert-Text](https://docconvert-text.melis.ai/convert): Format conversion (md↔html, json↔csv, etc.) · $0.001
+- [SchemaGate](https://schemagate.melis.ai/validate-schema): Validate LLM output against JSON Schema · $0.001
+- [NotifyRelay /webhook](https://notify.melis.ai/webhook): POST JSON to any public URL (HMAC-signed) · $0.001
+- [PromptGuard](https://promptguard.melis.ai/score): Prompt injection risk score (0–100) · $0.002
+- [NotifyRelay /notify](https://notify.melis.ai/notify): Send Telegram message · $0.002
+- [StructExtract](https://structextract.melis.ai/extract): HTML → structured JSON (tables, links, emails, phones) · $0.002
+- [DocConvert-PDF](https://docconvert-pdf.melis.ai/convert): HTML or markdown → PDF (base64) · $0.005
+- [LinkRisk](https://linkrisk.melis.ai/profile): Lightweight URL risk profile (heuristic) · $0.005
+- [MarkdownOpt](https://markdownopt.melis.ai/markdown): URL or HTML → clean LLM-ready markdown (~70% token reduction) · $0.005
+- [NotifyRelay /email](https://notify.melis.ai/email): Send transactional email · $0.005
+- [LinkSafe](https://linksafe.melis.ai/verify): Definitive URL safety check (Playwright sandbox + VirusTotal) · $0.01
+- [ScrapePay](https://scrapepay.melis.ai/scrape): Web extraction via Playwright (robots.txt enforced, charge-on-failure-safe) · $0.01
+- [Screenshot](https://molt.melis.ai/screenshot): Headless Chromium PNG · $0.02
+- [Web Synthesise](https://molt.melis.ai/web/synthesise): Multi-source research synthesis with citations · $0.05
+- [PDF Render](https://molt.melis.ai/pdf/render): High-fidelity URL or HTML → PDF via Playwright · $0.49
 
 ## Key documentation
 
@@ -35,6 +35,7 @@ Fleet status: 14 green / 0 red (last audited 2026-05-07)
 - [x402 payment flow](https://agents.melis.ai/docs/x402-payment): how the protocol works, client libraries, settlement details
 - [Composition recipes](https://agents.melis.ai/compose): canonical agent workflows with code examples and cost breakdowns
 - [Pricing](https://agents.melis.ai/pricing): full price table and comparison vs alternatives
+- [FAQ](https://agents.melis.ai/faq): 20+ questions covering x402, MCP, payment, comparisons, and security
 
 ## Optional
 
