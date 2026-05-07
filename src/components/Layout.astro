@@ -69,6 +69,7 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
       rel="stylesheet"
     />
 
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     {breadcrumbSchema && (
       <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
@@ -115,7 +116,7 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
 
         <div class="footer-links">
           <div class="footer-group">
-            <h4>Services</h4>
+            <p class="footer-group-title">Services</p>
             <ul>
               <li><a href="/services/scrapepay">ScrapePay</a></li>
               <li><a href="/services/markdownopt">MarkdownOpt</a></li>
@@ -125,7 +126,7 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
           </div>
 
           <div class="footer-group">
-            <h4>Docs</h4>
+            <p class="footer-group-title">Docs</p>
             <ul>
               <li><a href="/docs/install-mcp">MCP Install</a></li>
               <li><a href="/docs/x402-payment">x402 Protocol</a></li>
@@ -135,7 +136,7 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
           </div>
 
           <div class="footer-group">
-            <h4>Links</h4>
+            <p class="footer-group-title">Links</p>
             <ul>
               <li><a href="/llms.txt">llms.txt</a></li>
               <li><a href="/llms-full.txt">llms-full.txt</a></li>

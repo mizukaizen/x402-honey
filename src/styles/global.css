@@ -59,6 +59,17 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Underline links embedded in running text so they're distinguishable without colour alone */
+p a, li > span a, li > a:not([class]) {
+  text-decoration: underline;
+  text-decoration-color: rgba(168,85,247,0.4);
+  text-decoration-skip-ink: auto;
+}
+
+p a:hover, li > span a:hover {
+  text-decoration-color: var(--accent);
+}
+
 h1, h2, h3, h4 {
   font-weight: 600;
   line-height: 1.25;
@@ -155,7 +166,7 @@ code:not(pre code) {
 }
 
 .nav-links .cta {
-  background: var(--accent);
+  background: #7c3aed;
   color: white;
   padding: 6px 14px;
   border-radius: var(--radius-sm);
@@ -165,7 +176,7 @@ code:not(pre code) {
 }
 
 .nav-links .cta:hover {
-  background: var(--accent-hover);
+  background: #6d28d9;
   color: white;
 }
 
@@ -205,7 +216,7 @@ code:not(pre code) {
   flex-wrap: wrap;
 }
 
-.footer-group h4 {
+.footer-group-title {
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
