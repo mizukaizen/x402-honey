@@ -12,7 +12,7 @@ export const WINDOW_DAYS = 30;
 export const KNOWN_TIERS = ['0.001', '0.002', '0.005', '0.010', '0.020', '0.050', '0.490'];
 
 export const TIER_SHARE_COUNT: Record<string, number> = {
-  '0.001': 5,
+  '0.001': 6,
   '0.002': 3, // PromptGuard, StructExtract, ImageGuard
   '0.005': 4,
   '0.010': 2,

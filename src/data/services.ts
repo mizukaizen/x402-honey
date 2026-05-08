@@ -683,6 +683,57 @@ export const services: Service[] = [
       'Returns HTTP 403 for SSRF-blocked URLs, HTTP 415 for unsupported image formats, HTTP 413 for base64 images over 10MB, HTTP 451 for CSAM-flagged content. None of these settle payment. HTTP 502 if the upstream moderation backend is unavailable (retry safe).',
   },
   {
+    slug: 'memoryserve',
+    name: 'MemoryServe',
+    tagline: 'Agent memory store with semantic recall. Write memories, query by meaning.',
+    description:
+      'Post text and it is embedded and stored in a vector database keyed to your agent_id. Query by natural language and get back the most semantically similar memories. Built on Qdrant. The canonical x402 RAG pipeline: ScrapePay → MarkdownOpt → EmbedPay → MemoryServe. Delete by memory ID or wipe all memories for an agent (GDPR compliance). $0.001 per write or query. No account, no signup — pay per call via x402.',
+    price: 0.001,
+    priceLabel: '$0.001',
+    endpoint: 'https://memoryserve.melis.ai/memory/write',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'ai',
+    composes: ['embedpay', 'scrapepay', 'markdownopt', 'memscrub'],
+    requestExample: {
+      agent_id: 'my-agent-001',
+      namespace: 'research',
+      content: 'The Eiffel Tower was built in 1889 for the World Fair.',
+      tags: ['facts', 'paris', 'history'],
+    },
+    responseExample: {
+      success: true,
+      memory_id: '7ea9afac-c3d1-4b2e-9f3a-1234abcd5678',
+      agent_id: 'my-agent-001',
+      namespace: 'research',
+      content_length: 53,
+      tags: ['facts', 'paris', 'history'],
+      created_at: '2026-05-08T16:33:43Z',
+      payment_hash: '0x...',
+    },
+    alternatives: [
+      {
+        name: 'Pinecone / Qdrant Cloud',
+        notes:
+          'Pinecone and Qdrant Cloud are production vector databases with SLAs and advanced features. MemoryServe is x402-native — no account, pay-per-operation, composable with EmbedPay for a zero-signup RAG pipeline.',
+      },
+      {
+        name: 'Mem0 / LangChain memory',
+        notes:
+          'Mem0 and LangChain memory modules require agent framework integration. MemoryServe is a plain HTTP API — any agent that can make a POST request can use it regardless of framework.',
+      },
+    ],
+    scenarios: [
+      'Store research summaries from ScrapePay + MarkdownOpt, recall by topic later',
+      'RAG pipeline: embed with EmbedPay, store in MemoryServe, scrub recalls with MemScrub',
+      'Per-user memory namespaces for personalised agent responses',
+      'GDPR compliance: store then DELETE /memory/agent/{id} to wipe on user request',
+    ],
+    rateLimit: '600 requests per minute per IP.',
+    failureBehaviour:
+      'Returns HTTP 400 if agent_id or content is missing. Returns HTTP 503 if EmbedPay embedding backend is unavailable. DELETE operations are free and always succeed (GDPR). No settlement on any non-200 response.',
+  },
+  {
     slug: 'memscrub',
     name: 'MemScrub',
     tagline: 'Detect indirect prompt injection in RAG content before LLM injection.',
