@@ -90,6 +90,10 @@ import { services } from '../data/services';
       <div class="service-grid">
         {services.map((s) => <ServiceCard service={s} />)}
       </div>
+      <p class="activity-caveat">
+        Activity heatmaps show inbound USDC settlements per price tier over 30 days, sourced from
+        on-chain data at build time. Multiple services share a tier — counts are not per-service.
+      </p>
     </div>
   </section>
 
@@ -403,6 +407,14 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
+}
+
+.activity-caveat {
+  margin-top: 1.25rem;
+  font-size: 11px;
+  color: var(--text-3);
+  max-width: 640px;
+  line-height: 1.6;
 }
 
 /* Compose */

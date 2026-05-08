@@ -1,5 +1,6 @@
 ---
 import type { Service } from '../data/services';
+import activityData from '../data/activity.json';
 
 interface Props {
   service: Service;
@@ -16,6 +17,34 @@ const categoryColour: Record<string, string> = {
 };
 
 const colour = categoryColour[service.category] ?? 'teal';
+
+// Map service price to tier key (e.g. 0.01 → "0.010")
+const tierKey = service.price.toFixed(3);
+const tierData = (activityData.tiers as Record<string, { daily_calls: number[]; last_call_iso: string | null; max_non_zero: number }>)[tierKey];
+
+// Compute per-cell opacity: min 0.07 (empty), max 1.0 (peak day)
+function opacityForCount(count: number, max: number): number {
+  if (max === 0 || count === 0) return 0.07;
+  return 0.18 + (count / max) * 0.82;
+}
+
+const cells = tierData
+  ? tierData.daily_calls.map((c) => opacityForCount(c, tierData.max_non_zero))
+  : new Array(30).fill(0.07);
+
+// Format last call as relative time
+function relativeTime(iso: string | null): string {
+  if (!iso) return 'no activity';
+  const diff = Date.now() - new Date(iso).getTime();
+  const hours = Math.floor(diff / 3_600_000);
+  if (hours < 1) return 'just now';
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+const lastCall = tierData?.last_call_iso ?? null;
+const lastCallLabel = relativeTime(lastCall);
 ---
 
 <a href={`/services/${service.slug}`} class="service-card">
@@ -25,6 +54,18 @@ const colour = categoryColour[service.category] ?? 'teal';
   </div>
   <h3>{service.name}</h3>
   <p>{service.tagline}</p>
+
+  <!-- 30-day activity heatmap -->
+  <div class="heatmap" title="30-day call activity (newest right)">
+    {cells.map((opacity) => (
+      <span class="heatmap-cell" style={`opacity: ${opacity.toFixed(2)}`} />
+    ))}
+  </div>
+  <div class="heatmap-meta">
+    <span>30d activity</span>
+    <span>{lastCallLabel}</span>
+  </div>
+
   <span class="service-card-cta">View →</span>
 </a>
 
@@ -78,6 +119,29 @@ p {
   color: var(--text-2);
   line-height: 1.5;
   flex: 1;
+}
+
+.heatmap {
+  display: flex;
+  gap: 3px;
+  margin-top: 0.25rem;
+}
+
+.heatmap-cell {
+  flex: 1;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--teal);
+  display: block;
+}
+
+.heatmap-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  margin-top: -2px;
 }
 
 .service-card-cta {

@@ -5,15 +5,17 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "tsx src/lib/fetch-activity.ts",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.7.0",
-    "@astrojs/sitemap": "^3.2.1"
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.7.0"
   },
   "devDependencies": {
+    "tsx": "^4.21.0",
     "typescript": "^5.7.3"
   }
 }
