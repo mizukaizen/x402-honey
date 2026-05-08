@@ -18,11 +18,9 @@ const categoryColour: Record<string, string> = {
 
 const colour = categoryColour[service.category] ?? 'teal';
 
-// Map service price to tier key (e.g. 0.01 → "0.010")
 const tierKey = service.price.toFixed(3);
 const tierData = (activityData.tiers as Record<string, { daily_calls: number[]; last_call_iso: string | null; max_non_zero: number }>)[tierKey];
 
-// Compute per-cell opacity: min 0.07 (empty), max 1.0 (peak day)
 function opacityForCount(count: number, max: number): number {
   if (max === 0 || count === 0) return 0.07;
   return 0.18 + (count / max) * 0.82;
@@ -32,7 +30,6 @@ const cells = tierData
   ? tierData.daily_calls.map((c) => opacityForCount(c, tierData.max_non_zero))
   : new Array(30).fill(0.07);
 
-// Format last call as relative time
 function relativeTime(iso: string | null): string {
   if (!iso) return 'no activity';
   const diff = Date.now() - new Date(iso).getTime();
@@ -43,11 +40,10 @@ function relativeTime(iso: string | null): string {
   return `${days}d ago`;
 }
 
-const lastCall = tierData?.last_call_iso ?? null;
-const lastCallLabel = relativeTime(lastCall);
+const lastCallLabel = relativeTime(tierData?.last_call_iso ?? null);
 ---
 
-<a href={`/services/${service.slug}`} class="service-card">
+<a href={`/services/${service.slug}`} class="service-card" data-tier={tierKey}>
   <div class="service-card-header">
     <span class={`badge badge-${colour}`}>{service.category}</span>
     <span class="service-price">{service.priceLabel} <span>USDC</span></span>
@@ -55,15 +51,18 @@ const lastCallLabel = relativeTime(lastCall);
   <h3>{service.name}</h3>
   <p>{service.tagline}</p>
 
-  <!-- 30-day activity heatmap -->
   <div class="heatmap" title="30-day call activity (newest right)">
-    {cells.map((opacity) => (
-      <span class="heatmap-cell" style={`opacity: ${opacity.toFixed(2)}`} />
+    {cells.map((opacity, i) => (
+      <span
+        class="heatmap-cell"
+        data-index={i}
+        style={`opacity: ${opacity.toFixed(2)}`}
+      />
     ))}
   </div>
   <div class="heatmap-meta">
     <span>30d activity</span>
-    <span>{lastCallLabel}</span>
+    <span class="last-call">{lastCallLabel}</span>
   </div>
 
   <span class="service-card-cta">View →</span>
@@ -133,6 +132,17 @@ p {
   border-radius: 2px;
   background: var(--teal);
   display: block;
+  transition: opacity 0.4s ease;
+}
+
+@keyframes cell-flash {
+  0%   { transform: scaleY(1);   filter: brightness(1); }
+  25%  { transform: scaleY(1.5); filter: brightness(2); }
+  100% { transform: scaleY(1);   filter: brightness(1); }
+}
+
+.heatmap-cell.flashing {
+  animation: cell-flash 600ms ease-out;
 }
 
 .heatmap-meta {

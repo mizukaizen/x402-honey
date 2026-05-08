@@ -1,0 +1,74 @@
+---
+// Rendered server-side as a static shell; JS hydrates state and counter.
+---
+
+<div id="live-badge" class="live-badge live-badge--init" aria-live="polite">
+  <span class="live-dot"></span>
+  <span class="live-text">live</span>
+  <span class="live-age"></span>
+</div>
+
+<style>
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-3);
+  opacity: 0; /* hidden until JS hydrates */
+  transition: opacity 0.3s;
+}
+
+.live-badge.hydrated {
+  opacity: 1;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* fresh < 90s */
+.live-badge--fresh .live-dot {
+  background: #6FD08C;
+  box-shadow: 0 0 0 0 rgba(111, 208, 140, 0.6);
+  animation: pulse-green 2s infinite;
+}
+
+.live-badge--fresh .live-text {
+  color: #6FD08C;
+}
+
+/* stale 90-300s */
+.live-badge--stale .live-dot {
+  background: #F5A623;
+}
+
+.live-badge--stale .live-text {
+  color: #F5A623;
+}
+
+/* paused (tab hidden) */
+.live-badge--paused .live-dot {
+  background: var(--text-3);
+}
+
+/* error */
+.live-badge--error .live-dot {
+  background: var(--text-3);
+}
+
+@keyframes pulse-green {
+  0%   { box-shadow: 0 0 0 0 rgba(111, 208, 140, 0.6); }
+  70%  { box-shadow: 0 0 0 6px rgba(111, 208, 140, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(111, 208, 140, 0); }
+}
+
+.live-age {
+  color: var(--text-3);
+}
+</style>

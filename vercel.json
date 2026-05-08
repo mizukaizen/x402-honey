@@ -1,0 +1,9 @@
+{
+  "outputDirectory": "dist",
+  "buildCommand": "npm run build",
+  "functions": {
+    "api/activity.ts": {
+      "maxDuration": 15
+    }
+  }
+}

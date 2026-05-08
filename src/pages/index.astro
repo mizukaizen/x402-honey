@@ -1,6 +1,7 @@
 ---
 import Layout from '../components/Layout.astro';
 import ServiceCard from '../components/ServiceCard.astro';
+import LiveBadge from '../components/LiveBadge.astro';
 import SchemaOrg from '../components/SchemaOrg.astro';
 import { services } from '../data/services';
 ---
@@ -83,8 +84,13 @@ import { services } from '../data/services';
   <section class="services-section">
     <div class="container">
       <div class="section-header">
-        <h2>16 services. Zero subscriptions.</h2>
-        <p>Each call is a discrete payment. Your agent pays only for what it uses.</p>
+        <div class="section-header-row">
+          <div>
+            <h2>16 services. Zero subscriptions.</h2>
+            <p>Each call is a discrete payment. Your agent pays only for what it uses.</p>
+          </div>
+          <LiveBadge />
+        </div>
       </div>
 
       <div class="service-grid">
@@ -213,6 +219,16 @@ await client.callTool("notifyrelay_email", {
       </div>
     </div>
   </section>
+
+  <!-- Live activity hydration -->
+  <script>
+    import { initLiveActivity } from '../lib/activity-client';
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => initLiveActivity());
+    } else {
+      initLiveActivity();
+    }
+  </script>
 
   <!-- Transparency strip -->
   <section class="transparency-section">
@@ -415,6 +431,14 @@ h1 {
   color: var(--text-3);
   max-width: 640px;
   line-height: 1.6;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* Compose */
