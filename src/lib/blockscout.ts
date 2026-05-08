@@ -13,7 +13,7 @@ export const KNOWN_TIERS = ['0.001', '0.002', '0.005', '0.010', '0.020', '0.050'
 
 export const TIER_SHARE_COUNT: Record<string, number> = {
   '0.001': 4,
-  '0.002': 3,
+  '0.002': 3, // PromptGuard, StructExtract, ImageGuard
   '0.005': 4,
   '0.010': 2,
   '0.020': 1,

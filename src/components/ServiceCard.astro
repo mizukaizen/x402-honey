@@ -14,6 +14,7 @@ const categoryColour: Record<string, string> = {
   notify:   'gold',
   convert:  'gold',
   validate: 'purple',
+  ai:       'teal',
 };
 
 const colour = categoryColour[service.category] ?? 'teal';
@@ -46,7 +47,7 @@ const lastCallLabel = relativeTime(tierData?.last_call_iso ?? null);
 <a href={`/services/${service.slug}`} class="service-card" data-tier={tierKey}>
   <div class="service-card-header">
     <span class={`badge badge-${colour}`}>{service.category}</span>
-    <span class="service-price">{service.priceLabel} <span>USDC</span></span>
+    <span class="service-price">{service.priceDisplay ?? service.priceLabel} <span>USDC</span></span>
   </div>
   <h3>{service.name}</h3>
   <p>{service.tagline}</p>

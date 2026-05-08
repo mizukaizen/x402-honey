@@ -8,7 +8,8 @@ export interface Service {
   endpoint: string;
   method: 'POST' | 'GET';
   wallet: 'microservices' | 'molt';
-  category: 'web' | 'safety' | 'notify' | 'convert' | 'validate';
+  category: 'web' | 'safety' | 'notify' | 'convert' | 'validate' | 'ai';
+  priceDisplay?: string; // override for non-per-call pricing display
   composes: string[];  // slugs of related services
   requestExample: object;
   responseExample: object;
@@ -632,6 +633,103 @@ export const services: Service[] = [
     ],
     rateLimit: 'Per-IP daily limit. Contact sean@melis.ai for details.',
     failureBehaviour: 'Returns HTTP 400 for private IPs and blocked URL patterns.',
+  },
+  {
+    slug: 'imageguard',
+    name: 'ImageGuard',
+    tagline: 'Score images for NSFW, violence, weapons, hate, and self-harm.',
+    description:
+      'POST an image URL or base64 image and receive confidence scores per moderation class. Returns scores for nsfw, violence, weapons, hate, self_harm, gore, and drugs. Optional threshold_advisory triggers per-class flagged booleans. SSRF-hardened: private IP ranges blocked before any payment is attempted. CSAM positive returns 451 with no scores and no settlement. Composes naturally with /image/generate and ScrapePay — any agent that handles images should gate on ImageGuard before storing or displaying content.',
+    price: 0.002,
+    priceLabel: '$0.002',
+    endpoint: 'https://imageguard.melis.ai/score',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'safety',
+    composes: ['scrapepay', 'screenshot', 'promptguard'],
+    requestExample: {
+      image_url: 'https://example.com/photo.jpg',
+      classes: ['nsfw', 'violence', 'weapons'],
+      threshold_advisory: 0.7,
+    },
+    responseExample: {
+      success: true,
+      scores: { nsfw: 0.04, violence: 0.12, weapons: 0.89 },
+      flagged: { nsfw: false, violence: false, weapons: true },
+      scored_at: '2026-05-08T14:23:11Z',
+      model_version: 'imageguard-v1.0',
+      payment_hash: '0x...',
+    },
+    alternatives: [
+      {
+        name: 'Sightengine',
+        notes:
+          'Sightengine covers similar classes at $0.002 per image but requires a $29/month subscription on top. ImageGuard is pay-per-call with no subscription, making it cheaper at low volumes.',
+      },
+      {
+        name: 'Hive Moderation',
+        notes:
+          'Hive has broader model coverage and faster latency but requires an account and API key. ImageGuard is x402-native — no account, no API key, composable with any x402-aware agent.',
+      },
+    ],
+    scenarios: [
+      'Screen a generated image from /image/generate before storing in a user-facing gallery',
+      'Validate scraped images from ScrapePay before displaying to users',
+      'Content moderation gate for a user-uploaded-image pipeline',
+      'Screenshot safety check before including in a report',
+    ],
+    rateLimit: '60 requests per minute per IP. 1000 requests per minute global.',
+    failureBehaviour:
+      'Returns HTTP 403 for SSRF-blocked URLs, HTTP 415 for unsupported image formats, HTTP 413 for base64 images over 10MB, HTTP 451 for CSAM-flagged content. None of these settle payment. HTTP 502 if the upstream moderation backend is unavailable (retry safe).',
+  },
+  {
+    slug: 'embedpay',
+    name: 'EmbedPay',
+    tagline: 'Vector embeddings for RAG pipelines. Pay per 1k tokens, no API key.',
+    description:
+      'POST text and receive a vector embedding from OpenAI text-embedding-3-small (1536 dimensions). No account, no API key, no subscription — pay per 1k tokens via x402. Single input or batch (array). Batch of ≥100 inputs gets reduced pricing ($0.00003/1k tokens vs $0.00005/1k standard). Token counting uses cl100k_base (same as OpenAI) for honest billing — you can verify the token count yourself. Input tokens and model version are always returned so you know exactly what you paid for. Models: openai-3-small (default, 1536d), openai-3-large (3072d). Composes naturally with ScrapePay → MarkdownOpt → EmbedPay → vector DB.',
+    price: 0.00005,
+    priceLabel: '$0.00005',
+    priceDisplay: '$0.0001 / 1k tokens',
+    endpoint: 'https://embedpay.melis.ai/embed',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'ai',
+    composes: ['scrapepay', 'markdownopt', 'docconvert-text'],
+    requestExample: {
+      input: 'The quick brown fox jumps over the lazy dog',
+      model: 'openai-3-small',
+    },
+    responseExample: {
+      success: true,
+      embedding: [0.0123, -0.0456, 0.0789],
+      model: 'openai-3-small',
+      dimensions: 1536,
+      input_tokens: 9,
+      model_version: 'text-embedding-3-small (2024-01-25)',
+      payment_hash: '0x...',
+    },
+    alternatives: [
+      {
+        name: 'OpenAI Embeddings API',
+        notes:
+          'OpenAI charges $0.02 per million tokens ($0.00002/1k) — cheaper at scale, but requires an account, API key, and rate limit management. EmbedPay wraps the same model at 2.5× the wholesale rate for the x402 convenience premium: no signup, composable with other x402 services.',
+      },
+      {
+        name: 'Voyage AI',
+        notes:
+          'Voyage voyage-3-lite is very competitive at $0.016/M tokens and has better retrieval quality on some benchmarks. EmbedPay is the right choice when you want zero-friction embedding in an existing x402 agent stack without adding another provider.',
+      },
+    ],
+    scenarios: [
+      'RAG pipeline: ScrapePay → MarkdownOpt → EmbedPay → insert into Qdrant/Pinecone',
+      'Semantic search over agent memory: embed each memory chunk for cosine similarity retrieval',
+      'Batch-embed a corpus of documents at batch pricing before ingestion',
+      'Duplicate detection: embed two texts and compare cosine similarity',
+    ],
+    rateLimit: '600 requests per minute per IP. 10M tokens per IP per hour.',
+    failureBehaviour:
+      'Returns HTTP 413 if any input exceeds 8,000 tokens. Returns HTTP 400 for empty or non-string inputs. Returns HTTP 503 if nomic-embed is requested but self-hosted backend is not configured. None of these settle payment.',
   },
 ];
 
