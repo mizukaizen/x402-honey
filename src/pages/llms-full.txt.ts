@@ -16,12 +16,12 @@ export const GET: APIRoute = () => {
   lines.push('');
   lines.push('**Boring infrastructure for AI agents.**');
   lines.push('');
-  lines.push('16 pay-per-call x402 utility APIs. No accounts. No API keys. No subscriptions.');
+  lines.push('20 pay-per-call x402 utility APIs. No accounts. No API keys. No subscriptions.');
   lines.push('Pay per call in USDC on Base via the x402 protocol.');
   lines.push('');
   lines.push('### Three things to know');
   lines.push('');
-  lines.push('1. **Charge-on-failure-safe.** Payment only settles on successful 2xx + non-empty content. Robots.txt enforced. SSRF-hardened across all 16 services.');
+  lines.push('1. **Charge-on-failure-safe.** Payment only settles on successful 2xx + non-empty content. Robots.txt enforced. SSRF-hardened across all 20 services.');
   lines.push('2. **Composes naturally.** Each service is a building block: scrape → clean → guard → validate → notify.');
   lines.push('3. **One install.** `npx @melis-ai/x402-tools-mcp` gives any MCP-aware agent access to the full catalogue.');
   lines.push('');
@@ -133,6 +133,13 @@ export const GET: APIRoute = () => {
   lines.push('');
   lines.push('Use when: an agent handles user-supplied links before visiting or sharing them.');
   lines.push('');
+  lines.push('### 5. Canonical x402 RAG pipeline');
+  lines.push('');
+  lines.push('ScrapePay → MarkdownOpt → EmbedPay → MemoryServe /memory/write → MEMSCRUB /scrub');
+  lines.push('Cost: ~$0.017 per 5k-token page ($0.01 + $0.005 + $0.0003 + $0.001 + $0.001)');
+  lines.push('');
+  lines.push('Use when: building a RAG system that stores web content with semantic recall. MEMSCRUB scans retrieved chunks before feeding them to the LLM to block indirect prompt injection. See https://agents.melis.ai/pipelines/rag for the full walkthrough.');
+  lines.push('');
   lines.push('---');
   lines.push('');
   lines.push('## INFRASTRUCTURE');
@@ -143,7 +150,7 @@ export const GET: APIRoute = () => {
   lines.push('- Settlement chain: Base (Coinbase L2), USDC only');
   lines.push('- Microservices wallet: 0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC');
   lines.push('- Molt Swarm wallet: 0x61F2eF18ab0630912D24Fd0A30288619735AfFf5');
-  lines.push('- Fleet status: 14 green / 0 red (audited 2026-05-07)');
+  lines.push('- Fleet status: 18 green / 0 red (audited 2026-05-08)');
   lines.push('- Security audit: All 4 critical findings closed 2026-05-07 (SSRF, secrets, rate limiting, spend caps)');
   lines.push('- Charge-on-failure: Fixed at SDK level, full fleet rebuilt 2026-05-07');
 

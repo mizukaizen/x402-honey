@@ -8,7 +8,7 @@ import { services } from '../data/services';
 
 <Layout
   title="melis x402 Tools — Boring infrastructure for AI agents"
-  description="16 pay-per-call x402 utility APIs for AI agents. Scrape, validate, notify, convert, synthesise. No accounts, no API keys. Pay per call in USDC on Base."
+  description="20 pay-per-call x402 utility APIs for AI agents. Scrape, validate, embed, guard, remember, synthesise. No accounts, no API keys. Pay per call in USDC on Base."
 >
   <Fragment slot="head">
     <SchemaOrg type="landing" />
@@ -25,7 +25,7 @@ import { services } from '../data/services';
 
       <h1>Boring infrastructure<br />for AI agents.</h1>
       <p class="hero-sub">
-        16 pay-per-call x402 utility APIs for AI agents — pay per call in USDC on Base,
+        20 pay-per-call x402 utility APIs for AI agents — pay per call in USDC on Base,
         no accounts, no API keys, no subscriptions.
       </p>
 
@@ -34,7 +34,7 @@ import { services } from '../data/services';
           <span class="bullet-icon">⬡</span>
           <span>
             <strong>Charge-on-failure-safe fleet.</strong> Payment only settles on successful 2xx + non-empty content.
-            Robots.txt enforced. SSRF-hardened across all 16 services.
+            Robots.txt enforced. SSRF-hardened across all 20 services.
           </span>
         </li>
         <li>
@@ -70,7 +70,7 @@ import { services } from '../data/services';
       <div class="hero-image-wrap">
         <img
           src="/og-hero.png"
-          alt="Paper-craft beehive diorama — tiny worker figurines in each hexagonal chamber doing different utility tasks, representing the 16 melis x402 services"
+          alt="Paper-craft beehive diorama — tiny worker figurines in each hexagonal chamber doing different utility tasks, representing the 20 melis x402 services"
           width="1600"
           height="900"
           loading="eager"
@@ -86,7 +86,7 @@ import { services } from '../data/services';
       <div class="section-header">
         <div class="section-header-row">
           <div>
-            <h2>16 services. Zero subscriptions.</h2>
+            <h2>20 services. Zero subscriptions.</h2>
             <p>Each call is a discrete payment. Your agent pays only for what it uses.</p>
           </div>
           <LiveBadge />
@@ -216,6 +216,7 @@ await client.callTool("notifyrelay_email", {
 
       <div class="compose-cta">
         <a href="/compose" class="btn-secondary">See all composition recipes →</a>
+        <a href="/pipelines/rag" class="btn-secondary">The canonical RAG pipeline →</a>
       </div>
     </div>
   </section>
@@ -244,7 +245,7 @@ await client.callTool("notifyrelay_email", {
           >
             0x1C68…B3bC
           </a>
-          <span class="trans-note">All 13 core x402 microservices</span>
+          <span class="trans-note">All 17 core x402 microservices</span>
         </div>
         <div class="trans-item">
           <span class="trans-label">Molt Swarm wallet</span>
@@ -271,7 +272,7 @@ await client.callTool("notifyrelay_email", {
         </div>
         <div class="trans-item">
           <span class="trans-label">Fleet status</span>
-          <span class="trans-value status-green">14 green / 0 red</span>
+          <span class="trans-value status-green">18 green / 0 red</span>
           <span class="trans-note">Last audited 2026-05-07</span>
         </div>
         <div class="trans-item">
