@@ -126,7 +126,7 @@ export const GET: APIRoute = () => {
       title: 'melis x402 Tools',
       version: '1.0.0',
       description:
-        '16 pay-per-call x402 utility APIs for AI agents. All endpoints charge USDC on Base via the x402 protocol (HTTP 402). No accounts, no API keys, no subscriptions. Payment settles in ~2 seconds on Base (Coinbase L2).\n\nInstall the MCP wrapper: `npx @melis-ai/x402-tools-mcp`\n\nDocs: https://agents.melis.ai',
+        '20 pay-per-call x402 utility APIs for AI agents. All endpoints charge USDC on Base via the x402 protocol (HTTP 402). No accounts, no API keys, no subscriptions. Payment settles in ~2 seconds on Base (Coinbase L2).\n\nInstall the MCP wrapper: `npx @melis-ai/x402-tools-mcp`\n\nDocs: https://agents.melis.ai',
       contact: {
         name: 'Sean Melis',
         email: 'sean@melis.ai',

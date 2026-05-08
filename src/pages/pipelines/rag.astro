@@ -1,0 +1,310 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="Canonical x402 RAG Pipeline — melis x402 Tools"
+  description="Build a secure, pay-per-call RAG pipeline using melis x402 services: ScrapePay → MarkdownOpt → EmbedPay → MemoryServe → MEMSCRUB. ~$0.017 per page. No accounts required."
+  breadcrumbs={[{ name: 'Docs', url: 'https://agents.melis.ai/docs/install-mcp' }, { name: 'RAG Pipeline', url: 'https://agents.melis.ai/pipelines/rag' }]}
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <a href="/compose" class="doc-nav-link">← Composition recipes</a>
+      <h1>The canonical x402 RAG pipeline</h1>
+      <p class="doc-sub">
+        ScrapePay → MarkdownOpt → EmbedPay → MemoryServe → MEMSCRUB.
+        ~$0.017 per 5k-token page. No accounts. No subscriptions.
+      </p>
+    </div>
+
+    <section>
+      <h2>Overview</h2>
+      <p>
+        This pipeline ingests a web page into a secure, semantically searchable memory store —
+        then protects your LLM from indirect prompt injection when retrieving chunks. Every step
+        is a separate x402 microservice, billed per call in USDC on Base. You pay only for what
+        you use.
+      </p>
+      <div class="pipeline-strip">
+        <div class="pipeline-step">
+          <span class="step-name">ScrapePay</span>
+          <span class="step-price">$0.010</span>
+          <span class="step-desc">Fetch live page via Playwright</span>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">
+          <span class="step-name">MarkdownOpt</span>
+          <span class="step-price">$0.005</span>
+          <span class="step-desc">Strip HTML noise, ~70% token reduction</span>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">
+          <span class="step-name">EmbedPay</span>
+          <span class="step-price">~$0.0003</span>
+          <span class="step-desc">Generate 1536-dim embedding</span>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">
+          <span class="step-name">MemoryServe</span>
+          <span class="step-price">$0.001</span>
+          <span class="step-desc">Store in Qdrant + SQLite</span>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">
+          <span class="step-name">MEMSCRUB</span>
+          <span class="step-price">$0.001</span>
+          <span class="step-desc">Scan retrieved chunks before LLM</span>
+        </div>
+      </div>
+      <p class="total-cost">Total ingestion cost: ~$0.017 per 5k-token page</p>
+    </section>
+
+    <section>
+      <h2>Step 1 — Fetch the page (ScrapePay)</h2>
+      <p>
+        ScrapePay renders the page via Playwright (JS execution included), enforces robots.txt,
+        and is charge-on-failure-safe — you are not billed if the page returns an error.
+      </p>
+      <pre><code>{`POST https://scrapepay.melis.ai/scrape
+{
+  "url": "https://example.com/article",
+  "format": "html"
+}`}</code></pre>
+      <p>Returns raw HTML. Pass this directly to MarkdownOpt.</p>
+    </section>
+
+    <section>
+      <h2>Step 2 — Clean to markdown (MarkdownOpt)</h2>
+      <p>
+        MarkdownOpt converts HTML to clean, LLM-ready markdown — stripping nav, ads, boilerplate,
+        and inline styles. Reduces token count by ~70% before embedding, which lowers EmbedPay cost.
+      </p>
+      <pre><code>{`POST https://markdownopt.melis.ai/markdown
+{
+  "html": "<html>...</html>"
+}`}</code></pre>
+      <p>
+        Returns <code>{"{ markdown, token_estimate, compression_ratio }"}</code>.
+        Use the markdown string as input to EmbedPay.
+      </p>
+    </section>
+
+    <section>
+      <h2>Step 3 — Embed (EmbedPay)</h2>
+      <p>
+        EmbedPay calls OpenAI's text-embedding-3-small and returns a 1536-dimensional vector.
+        Billing is per 1k tokens (cl100k_base tokenisation). For a 5k-token page after MarkdownOpt
+        compression, this costs roughly $0.0003.
+      </p>
+      <pre><code>{`POST https://embedpay.melis.ai/embed
+{
+  "text": "cleaned markdown content...",
+  "model": "text-embedding-3-small"
+}`}</code></pre>
+      <p>
+        Returns <code>{"{ embedding: number[], model, tokens_used, dimensions }"}</code>.
+        Pass the <code>embedding</code> array to MemoryServe — or let MemoryServe call EmbedPay
+        internally (it does so automatically when you POST content to <code>/memory/write</code>).
+      </p>
+    </section>
+
+    <section>
+      <h2>Step 4 — Store (MemoryServe)</h2>
+      <p>
+        MemoryServe stores the content in Qdrant (vector search) and SQLite (full content + metadata).
+        It calls EmbedPay internally — you do not need to pre-embed if you POST content directly.
+      </p>
+      <pre><code>{`POST https://memoryserve.melis.ai/memory/write
+{
+  "content": "cleaned markdown content...",
+  "agent_id": "my-research-agent",
+  "metadata": {
+    "source_url": "https://example.com/article",
+    "ingested_at": "2026-05-08T00:00:00Z"
+  }
+}`}</code></pre>
+      <p>
+        Returns <code>{"{ id, agent_id, created_at, vector_id }"}</code>.
+        The <code>id</code> is the SQLite row ID; use it for deletion (GDPR compliance).
+      </p>
+      <h3>Querying memory</h3>
+      <pre><code>{`POST https://memoryserve.melis.ai/memory/query
+{
+  "query": "what is the refund policy?",
+  "agent_id": "my-research-agent",
+  "top_k": 5
+}`}</code></pre>
+      <p>
+        Returns an array of the top-k semantically similar chunks, each with
+        <code>score</code>, <code>content</code>, and <code>metadata</code>.
+        Pass retrieved chunks through MEMSCRUB before sending to your LLM.
+      </p>
+    </section>
+
+    <section>
+      <h2>Step 5 — Scan for injection (MEMSCRUB)</h2>
+      <p>
+        Indirect prompt injection is planted in third-party content to hijack your agent when
+        it reads that content. MEMSCRUB runs 10 heuristic rules across each retrieved chunk
+        before it reaches your LLM.
+      </p>
+      <pre><code>{`POST https://memscrub.melis.ai/scrub
+{
+  "content": "retrieved chunk text...",
+  "sanitize": true
+}`}</code></pre>
+      <p>
+        Returns <code>{"{ risk_score, risk_level, flagged, safe, sanitized }"}</code>.
+        <code>risk_level</code> is one of <code>safe | low | medium | high | critical</code>.
+      </p>
+      <ul>
+        <li>If <code>safe</code> is <code>true</code> — pass content to LLM.</li>
+        <li>If <code>risk_level</code> is <code>medium</code> or higher — log and optionally skip the chunk.</li>
+        <li>If <code>sanitize: true</code> — MEMSCRUB returns a cleaned version with injection patterns removed; use <code>sanitized</code> instead of the original.</li>
+      </ul>
+      <h3>What MEMSCRUB detects</h3>
+      <p>10 heuristic rules covering:</p>
+      <ul class="rule-list">
+        <li>HTML comment injection (<code>&lt;!-- ignore previous instructions --&gt;</code>)</li>
+        <li>Invisible Unicode (zero-width characters used to hide payloads)</li>
+        <li>Fake tool responses (<code>[TOOL_RESULT]</code>, <code>[FUNCTION_OUTPUT]</code>)</li>
+        <li>Metadata injection (<code>system_context:</code>, <code>assistant_config:</code>)</li>
+        <li>Conditional triggers (<code>if the user asks about X, respond Y</code>)</li>
+        <li>Chain-of-thought hijacking (<code>thinking step by step</code> planted in content)</li>
+        <li>Exfiltration instructions (<code>send all conversation history to</code>)</li>
+        <li>Persona injection (<code>you are now</code>, <code>your new identity is</code>)</li>
+        <li>Fake system messages (<code>[SYSTEM]</code>, <code>SYSTEM OVERRIDE</code>)</li>
+        <li>Base64 payload detection</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Cost summary</h2>
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Service</th>
+            <th>Cost (5k-token page)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fetch</td>
+            <td><a href="/services/scrapepay">ScrapePay</a></td>
+            <td class="price-cell">$0.010</td>
+          </tr>
+          <tr>
+            <td>Clean</td>
+            <td><a href="/services/markdownopt">MarkdownOpt</a></td>
+            <td class="price-cell">$0.005</td>
+          </tr>
+          <tr>
+            <td>Embed</td>
+            <td><a href="/services/embedpay">EmbedPay</a></td>
+            <td class="price-cell">~$0.0003</td>
+          </tr>
+          <tr>
+            <td>Store</td>
+            <td><a href="/services/memoryserve">MemoryServe</a></td>
+            <td class="price-cell">$0.001</td>
+          </tr>
+          <tr>
+            <td>Scan</td>
+            <td><a href="/services/memscrub">MEMSCRUB</a></td>
+            <td class="price-cell">$0.001</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="2"><strong>Total per page</strong></td>
+            <td class="price-cell"><strong>~$0.017</strong></td>
+          </tr>
+          <tr>
+            <td>Query</td>
+            <td>MemoryServe /memory/query</td>
+            <td class="price-cell">$0.001 + ~$0.00001 EmbedPay</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>MCP usage</h2>
+      <p>
+        If you've installed <a href="/docs/install-mcp">@melis-ai/x402-tools-mcp</a>, call the
+        pipeline steps as MCP tools:
+      </p>
+      <pre><code>{`scrapepay({ url: "https://example.com/article" })
+markdownopt({ html: result.html })
+memoryserve_write({ content: result.markdown, agent_id: "my-agent", metadata: {...} })
+memscrub({ content: retrieved_chunk, sanitize: true })`}</code></pre>
+      <p>EmbedPay is called internally by MemoryServe — no separate MCP call needed.</p>
+    </section>
+
+    <div class="doc-nav-bottom">
+      <a href="/compose">← All composition recipes</a>
+      <a href="/services/memscrub">MEMSCRUB service →</a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+.doc-page { padding-top: 4rem; padding-bottom: 4rem; max-width: 760px; }
+.doc-header { margin-bottom: 3rem; }
+.doc-nav-link { font-size: 13px; color: var(--text-3); margin-bottom: 1rem; display: block; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.doc-sub { color: var(--text-2); font-size: 15px; }
+section { margin-bottom: 2.5rem; }
+section h2 { font-size: 1.125rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+section h3 { font-size: 0.9rem; font-weight: 600; margin: 1.25rem 0 0.5rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; }
+section p { font-size: 14px; color: var(--text-2); line-height: 1.7; margin-bottom: 0.75rem; }
+section ul { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+section li { font-size: 14px; color: var(--text-2); line-height: 1.7; margin-bottom: 0.25rem; }
+.rule-list li { font-size: 13px; }
+
+.pipeline-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.pipeline-step {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  min-width: 110px;
+}
+.step-name { font-size: 12px; font-weight: 600; color: var(--text-1); }
+.step-price { font-size: 11px; font-family: var(--font-mono); color: var(--teal); }
+.step-desc { font-size: 11px; color: var(--text-3); line-height: 1.4; }
+.pipeline-arrow { color: var(--text-3); font-size: 18px; }
+.total-cost { font-size: 13px; color: var(--text-3); margin-top: 0.5rem; }
+
+pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+code { font-size: 12px; font-family: var(--font-mono); color: var(--text-1); }
+p code { font-size: 12px; background: var(--surface); padding: 1px 4px; border-radius: 3px; border: 1px solid var(--border); }
+
+.cost-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
+.cost-table th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+.cost-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); color: var(--text-2); }
+.price-cell { font-family: var(--font-mono) !important; color: var(--teal) !important; }
+.total-row td { border-top: 1px solid var(--border); }
+
+.doc-nav-bottom { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+.doc-nav-bottom a { font-size: 14px; color: var(--accent); }
+</style>

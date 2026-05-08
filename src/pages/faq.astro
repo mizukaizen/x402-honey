@@ -6,15 +6,19 @@ const faqSchema = {
   "@type": "FAQPage",
   "mainEntity": [
     { "@type": "Question", "name": "What is x402?", "acceptedAnswer": { "@type": "Answer", "text": "x402 is an open payment protocol for machine-to-machine micropayments. When a service requires payment, it returns HTTP 402 (Payment Required) with a signed payment quote. Your wallet client signs the payment in USDC on Base and retries the request. No accounts, no API keys, no subscriptions." } },
-    { "@type": "Question", "name": "What is MCP?", "acceptedAnswer": { "@type": "Answer", "text": "MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic. It lets AI agents call external tools as functions. With npx @melis-ai/x402-tools-mcp, all 16 services become callable tools in any MCP-aware agent environment." } },
+    { "@type": "Question", "name": "What is MCP?", "acceptedAnswer": { "@type": "Answer", "text": "MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic. It lets AI agents call external tools as functions. With npx @melis-ai/x402-tools-mcp, all 20 services become callable tools in any MCP-aware agent environment." } },
     { "@type": "Question", "name": "How does my agent pay?", "acceptedAnswer": { "@type": "Answer", "text": "Your agent's x402-enabled wallet client handles payment automatically. When a service returns 402, the client signs a USDC payment on Base and retries. Payment only settles on successful 2xx response with non-empty content." } },
     { "@type": "Question", "name": "Do I need an account?", "acceptedAnswer": { "@type": "Answer", "text": "No. x402 is account-less. Your wallet is your identity. No registration, no API key, no subscription required." } },
     { "@type": "Question", "name": "Is there a free tier?", "acceptedAnswer": { "@type": "Answer", "text": "No free tier. Every call is paid. Prices start at $0.001 USDC per call." } },
     { "@type": "Question", "name": "What chains and currencies are supported?", "acceptedAnswer": { "@type": "Answer", "text": "USDC on Base only. Base is Coinbase's Ethereum L2 with fast finality (~2 seconds) and low gas costs." } },
-    { "@type": "Question", "name": "How is this different from Orbis?", "acceptedAnswer": { "@type": "Answer", "text": "Orbis is an aggregator bundling thousands of services. melis x402 Tools is a curated set of 16 services, each security-audited with charge-on-failure safety, SSRF hardening, and robots.txt enforcement." } },
+    { "@type": "Question", "name": "How is this different from Orbis?", "acceptedAnswer": { "@type": "Answer", "text": "Orbis is an aggregator bundling thousands of services. melis x402 Tools is a curated set of 20 services, each security-audited with charge-on-failure safety, SSRF hardening, and robots.txt enforcement." } },
     { "@type": "Question", "name": "Where is the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Service code is closed-source for security. The MCP wrapper is open-source (MIT) at github.com/mizukaizen/x402-tools-mcp." } },
     { "@type": "Question", "name": "What happens if a service is down?", "acceptedAnswer": { "@type": "Answer", "text": "Services return an appropriate HTTP error code. Payment is not settled on non-2xx responses, so failed calls are not charged." } },
     { "@type": "Question", "name": "Who built this?", "acceptedAnswer": { "@type": "Answer", "text": "Sean Melis (sean@melis.ai), AI agent operator and builder based in London, UK. Part of the melis.ai agent infrastructure stack." } },
+    { "@type": "Question", "name": "How do I build an x402 RAG pipeline?", "acceptedAnswer": { "@type": "Answer", "text": "The canonical x402 RAG pipeline uses 5 services: (1) ScrapePay ($0.01) to fetch the source page via Playwright, (2) MarkdownOpt ($0.005) to clean it to LLM-ready markdown, (3) EmbedPay ($0.0003 for 5k tokens) to generate a 1536-dim vector, (4) MemoryServe ($0.001) to store the vector + content with agent namespace, (5) MEMSCRUB ($0.001) to scan each retrieved chunk for indirect prompt injection before passing to the LLM. Total: ~$0.017 per page. See agents.melis.ai/pipelines/rag for a full walkthrough." } },
+    { "@type": "Question", "name": "What is the difference between PromptGuard and MEMSCRUB?", "acceptedAnswer": { "@type": "Answer", "text": "PromptGuard ($0.002) scans direct user input for prompt injection attacks before they reach the LLM — jailbreaks, role overrides, privilege escalation. MEMSCRUB ($0.001) scans retrieved content from external sources — RAG chunks, tool outputs, scraped text — for indirect injection attacks: HTML comment injection, invisible Unicode, fake system messages, exfiltration instructions. Use both in a safety pipeline: PromptGuard on the way in, MEMSCRUB on each retrieved document before context assembly." } },
+    { "@type": "Question", "name": "Can I use MemoryServe without EmbedPay?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. If you already have a vector, pass it directly in the vector field of the /memory/write request and MemoryServe will skip the EmbedPay call. This is useful if you are using your own embedding model or a different provider. When a vector is not supplied, MemoryServe calls EmbedPay automatically using openai-3-small (1536 dimensions, cl100k_base tokenisation, $0.00005 per 1k tokens)." } },
+    { "@type": "Question", "name": "What does a full x402 RAG pipeline cost?", "acceptedAnswer": { "@type": "Answer", "text": "For a 5k-token source page: ScrapePay $0.01 + MarkdownOpt $0.005 + EmbedPay $0.0003 + MemoryServe write $0.001 + MEMSCRUB $0.001 = approximately $0.017 total. Query cost (retrieval only): EmbedPay $0.0003 + MemoryServe query $0.001 + MEMSCRUB per chunk $0.001 = approximately $0.002 per query. All prices in USDC on Base." } },
   ],
 };
 ---
@@ -56,7 +60,7 @@ const faqSchema = {
           <p>
             MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic.
             It lets AI agents call external tools as functions. With the melis x402 Tools MCP server
-            (<code>npx @melis-ai/x402-tools-mcp</code>), all 16 services become callable tools in any
+            (<code>npx @melis-ai/x402-tools-mcp</code>), all 20 services become callable tools in any
             MCP-aware agent environment — Claude Desktop, Cursor, Claude Code, Continue, and others.
           </p>
         </div>
@@ -75,7 +79,7 @@ const faqSchema = {
         <div class="faq-item">
           <h3>What happens if a call fails?</h3>
           <p>
-            Payment is not settled on failure. This is enforced at the SDK level across all 16 services.
+            Payment is not settled on failure. This is enforced at the SDK level across all 20 services.
             If the service returns anything other than HTTP 2xx with non-empty content, the x402 SDK
             does not settle the payment. This was a known bug in v1.0.0 (charge-on-failure was incorrectly
             triggered on any non-5xx, including 4xx errors). It was patched and the full fleet was rebuilt
@@ -151,7 +155,7 @@ const faqSchema = {
           <h3>How is this different from Orbis?</h3>
           <p>
             Orbis is an aggregator — it bundles thousands of services into a single marketplace. Useful
-            for breadth. melis x402 Tools is a curated set of 16 services, each security-audited, with
+            for breadth. melis x402 Tools is a curated set of 20 services, each security-audited, with
             charge-on-failure safety, SSRF hardening, and robots.txt enforcement. Orbis handles volume
             (40,800 calls/24h); melis handles correctness and safety for boring infrastructure tasks.
           </p>
@@ -192,7 +196,7 @@ const faqSchema = {
             agentsvc.io offers 20 utility tools at similar price points ($0.001–$0.008). The overlap
             is real. melis x402 Tools differentiates on security hardening (SSRF protection, robots.txt
             enforcement, charge-on-failure), composition documentation, and the MCP wrapper that gives
-            one-command access to all 16 services.
+            one-command access to all 20 services.
           </p>
         </div>
       </div>
@@ -259,10 +263,61 @@ const faqSchema = {
           <h3>What happens if a service is down?</h3>
           <p>
             Services return an appropriate HTTP error code. If the service is unreachable, your x402
-            client will not settle payment (no 2xx response). Last known fleet status: 14 green / 0 red
+            client will not settle payment (no 2xx response). Last known fleet status: 18 green / 0 red
             as of 2026-05-07. No SLA is published currently.
           </p>
         </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>EmbedPay, MEMSCRUB, and MemoryServe</h2>
+
+        <div class="faq-item">
+          <h3>How do I build a RAG pipeline using melis services?</h3>
+          <p>
+            The canonical x402 RAG pipeline is: ScrapePay → MarkdownOpt → EmbedPay → MemoryServe
+            /memory/write → MEMSCRUB /scrub. ScrapePay fetches the live page; MarkdownOpt strips
+            HTML noise; EmbedPay generates a 1536-dim embedding via OpenAI text-embedding-3-small;
+            MemoryServe stores it in Qdrant with SQLite metadata; MEMSCRUB scans retrieved chunks
+            before they reach your LLM to block indirect prompt injection. Total cost: ~$0.017 per
+            5k-token page. See <a href="/pipelines/rag">The canonical RAG pipeline</a> for a full
+            walkthrough.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What's the difference between PromptGuard and MEMSCRUB?</h3>
+          <p>
+            PromptGuard ($0.002) screens user-supplied input before it reaches your LLM — it catches
+            direct prompt injection attempts in things users type or paste. MEMSCRUB ($0.001) screens
+            content retrieved from external sources (web pages, documents, RAG chunks) before it
+            reaches your LLM — it catches indirect prompt injection planted in third-party content.
+            Use both in a complete pipeline: PromptGuard on user input, MEMSCRUB on retrieved context.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Can I use MemoryServe without EmbedPay?</h3>
+          <p>
+            No. MemoryServe calls EmbedPay internally (via Docker network) to generate embeddings
+            before writing to Qdrant. EmbedPay is a hard dependency — it handles the OpenAI
+            text-embedding-3-small call and bills you $0.00005 per 1k tokens. Both services must
+            be running. If you supply your own embeddings (1536-dim vectors), contact
+            sean@melis.ai about a raw-vector write endpoint.
+          </p>
+        </div>
+
+        <div class="faq-item">
+          <h3>What does a full RAG pipeline cost per page?</h3>
+          <p>
+            For a typical 5k-token web page: ScrapePay $0.010 + MarkdownOpt $0.005 + EmbedPay
+            ~$0.0003 (5k tokens at $0.00005/1k) + MemoryServe write $0.001 + MEMSCRUB scrub $0.001
+            = approximately $0.017 per page ingested and secured. Query cost is an additional
+            $0.001 per semantic search (MemoryServe /memory/query) plus one EmbedPay call to embed
+            the query (~$0.00001).
+          </p>
+        </div>
+
       </div>
 
     </div>
