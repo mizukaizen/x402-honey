@@ -16,12 +16,12 @@ export const GET: APIRoute = () => {
   lines.push('');
   lines.push('**Boring infrastructure for AI agents.**');
   lines.push('');
-  lines.push('20 pay-per-call x402 utility APIs. No accounts. No API keys. No subscriptions.');
+  lines.push('18 pay-per-call x402 utility APIs. No accounts. No API keys. No subscriptions.');
   lines.push('Pay per call in USDC on Base via the x402 protocol.');
   lines.push('');
   lines.push('### Three things to know');
   lines.push('');
-  lines.push('1. **Charge-on-failure-safe.** Payment only settles on successful 2xx + non-empty content. Robots.txt enforced. SSRF-hardened across all 20 services.');
+  lines.push('1. **Charge-on-failure-safe.** Payment only settles on successful 2xx + non-empty content. Robots.txt enforced. SSRF-hardened across all 18 services.');
   lines.push('2. **Composes naturally.** Each service is a building block: scrape → clean → guard → validate → notify.');
   lines.push('3. **One install.** `npx @melis-ai/x402-tools-mcp` gives any MCP-aware agent access to the full catalogue.');
   lines.push('');

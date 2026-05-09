@@ -519,84 +519,6 @@ export const services: Service[] = [
       'Returns HTTP 422 for private IPs, file:// URIs, or missing fields. Returns delivered: false with error message if the target URL returns a non-2xx.',
   },
   {
-    slug: 'web-synthesise',
-    name: 'Web Synthesise',
-    tagline: 'Multi-source web research with a synthesised answer + citations.',
-    description:
-      'Takes a research query, hits multiple web sources, and returns a synthesised answer with citations. Replaces the pattern of "scrape 10 pages, concatenate, summarise" with a single call. Useful when you need a quick, grounded answer with references rather than raw page content.',
-    price: 0.05,
-    priceLabel: '$0.050',
-    endpoint: 'https://api.melis.ai/web/synthesise',
-    method: 'POST',
-    wallet: 'molt',
-    category: 'web',
-    composes: ['promptguard', 'schemagate'],
-    requestExample: {
-      query: 'What are the current x402 protocol payment limits on Base?',
-      max_sources: 5,
-    },
-    responseExample: {
-      answer: 'As of May 2026, the x402 protocol on Base supports...',
-      citations: [
-        { title: 'x402.org docs', url: 'https://x402.org/spec' },
-      ],
-      sources_used: 4,
-    },
-    alternatives: [
-      {
-        name: 'Exa',
-        notes:
-          'Exa provides high-quality neural search over its own web index. Web Synthesise uses live web retrieval and synthesis — better for very recent information; Exa better for deep corpus search.',
-      },
-    ],
-    scenarios: [
-      'Research background for a brief before writing',
-      'Ground an agent\'s answer with citations before presenting to a user',
-      'Quick competitive intelligence sweep',
-    ],
-    rateLimit: 'None published.',
-    failureBehaviour: 'Returns HTTP 422 for empty query.',
-  },
-  {
-    slug: 'screenshot',
-    name: 'Screenshot',
-    tagline: 'Headless Chromium PNG screenshot of any public URL.',
-    description:
-      'Takes a full-page PNG screenshot of any public URL using headless Chromium. Returns the image as a base64 PNG. SSRF-hardened — private IP ranges, 169.254.x metadata endpoints, and file:// URIs are blocked. Useful when an agent needs a visual record of a page state, or when content is rendered in a format that cannot be extracted as text.',
-    price: 0.02,
-    priceLabel: '$0.020',
-    endpoint: 'https://api.melis.ai/screenshot',
-    method: 'POST',
-    wallet: 'molt',
-    category: 'web',
-    composes: ['scrapepay', 'linkrisk'],
-    requestExample: {
-      url: 'https://example.com',
-      full_page: true,
-    },
-    responseExample: {
-      image: 'iVBORw0KGgoAAAANSUhEUgA...',
-      encoding: 'base64',
-      format: 'png',
-      width: 1280,
-      height: 900,
-    },
-    alternatives: [
-      {
-        name: 'StableFlare / Cloudflare Browser Rendering',
-        notes:
-          'Cloudflare\'s browser rendering API is well-documented and reliable. Screenshot is useful when you\'re already using other melis.ai services and want one fewer vendor, or when you need SSRF protection baked in.',
-      },
-    ],
-    scenarios: [
-      'Capture a dashboard state for a monitoring agent',
-      'Archive a visual record of a web page at a point in time',
-      'Render a UI for visual QA within an agent workflow',
-    ],
-    rateLimit: 'Per-IP daily limit. Contact sean@melis.ai for details.',
-    failureBehaviour: 'Returns HTTP 400 for private IPs and blocked URL patterns.',
-  },
-  {
     slug: 'pdf-render',
     name: 'PDF Render',
     tagline: 'High-fidelity URL or HTML → PDF via Playwright. $0.49.',
@@ -608,7 +530,7 @@ export const services: Service[] = [
     method: 'POST',
     wallet: 'molt',
     category: 'convert',
-    composes: ['screenshot', 'docconvert-pdf'],
+    composes: ['docconvert-pdf'],
     requestExample: {
       url: 'https://example.com/report',
       format: 'A4',
@@ -646,7 +568,7 @@ export const services: Service[] = [
     method: 'POST',
     wallet: 'microservices',
     category: 'safety',
-    composes: ['scrapepay', 'screenshot', 'promptguard'],
+    composes: ['scrapepay', 'promptguard'],
     requestExample: {
       image_url: 'https://example.com/photo.jpg',
       classes: ['nsfw', 'violence', 'weapons'],
