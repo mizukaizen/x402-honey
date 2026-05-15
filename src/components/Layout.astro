@@ -77,6 +77,8 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="text/plain" title="LLM-readable site summary" href="/llms.txt" />
     <link rel="alternate" type="text/plain" title="LLM-readable full content" href="/llms-full.txt" />
+    <link rel="alternate" type="application/atom+xml" title="melis x402 Tools — release feed" href="/feed.xml" />
+    <link rel="search" type="application/opensearchdescription+xml" title="melis x402 Tools" href="/opensearch.xml" />
     {breadcrumbSchema && (
       <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
     )}
