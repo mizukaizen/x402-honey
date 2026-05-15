@@ -900,7 +900,7 @@ export const services: Service[] = [
       'Multi-agent chains can loop infinitely and burn budgets unnoticed. Loopwall is the spine of safe x402 orchestration: call /issue at chain start to mint a signed Job Envelope ($0.001) with origin, max_hops, and USD budget cap; then call /hop at each subsequent step ($0.0005) to validate against loop detection, hop-limit, and remaining budget. The envelope is cryptographically signed so any downstream agent can verify chain provenance without trusting the caller. Use as the orchestration backbone for any LLM-driven workflow that calls paid services.',
     price: 0.0005,
     priceLabel: '$0.0005',
-    priceDisplay: '$0.001 / issue · $0.0005 / hop',
+    priceDisplay: '$0.0005 / hop + $0.001 issue',
     endpoint: 'https://loopwall.melis.ai/issue',
     method: 'POST',
     wallet: 'microservices',
