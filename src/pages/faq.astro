@@ -6,12 +6,12 @@ const faqSchema = {
   "@type": "FAQPage",
   "mainEntity": [
     { "@type": "Question", "name": "What is x402?", "acceptedAnswer": { "@type": "Answer", "text": "x402 is an open payment protocol for machine-to-machine micropayments. When a service requires payment, it returns HTTP 402 (Payment Required) with a signed payment quote. Your wallet client signs the payment in USDC on Base and retries the request. No accounts, no API keys, no subscriptions." } },
-    { "@type": "Question", "name": "What is MCP?", "acceptedAnswer": { "@type": "Answer", "text": "MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic. It lets AI agents call external tools as functions. With npx @melis-ai/x402-tools-mcp, all 18 services become callable tools in any MCP-aware agent environment." } },
+    { "@type": "Question", "name": "What is MCP?", "acceptedAnswer": { "@type": "Answer", "text": "MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic. It lets AI agents call external tools as functions. With npx @melis-ai/x402-tools-mcp, all 22 services become callable tools in any MCP-aware agent environment." } },
     { "@type": "Question", "name": "How does my agent pay?", "acceptedAnswer": { "@type": "Answer", "text": "Your agent's x402-enabled wallet client handles payment automatically. When a service returns 402, the client signs a USDC payment on Base and retries. Payment only settles on successful 2xx response with non-empty content." } },
     { "@type": "Question", "name": "Do I need an account?", "acceptedAnswer": { "@type": "Answer", "text": "No. x402 is account-less. Your wallet is your identity. No registration, no API key, no subscription required." } },
     { "@type": "Question", "name": "Is there a free tier?", "acceptedAnswer": { "@type": "Answer", "text": "No free tier. Every call is paid. Prices start at $0.001 USDC per call." } },
     { "@type": "Question", "name": "What chains and currencies are supported?", "acceptedAnswer": { "@type": "Answer", "text": "USDC on Base only. Base is Coinbase's Ethereum L2 with fast finality (~2 seconds) and low gas costs." } },
-    { "@type": "Question", "name": "How is this different from Orbis?", "acceptedAnswer": { "@type": "Answer", "text": "Orbis is an aggregator bundling thousands of services. melis x402 Tools is a curated set of 18 services, each security-audited with charge-on-failure safety, SSRF hardening, and robots.txt enforcement." } },
+    { "@type": "Question", "name": "How is this different from Orbis?", "acceptedAnswer": { "@type": "Answer", "text": "Orbis is an aggregator bundling thousands of services. melis x402 Tools is a curated set of 22 services, each security-audited with charge-on-failure safety, SSRF hardening, and robots.txt enforcement." } },
     { "@type": "Question", "name": "Where is the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Service code is closed-source for security. The MCP wrapper is open-source (MIT) at github.com/mizukaizen/x402-tools-mcp." } },
     { "@type": "Question", "name": "What happens if a service is down?", "acceptedAnswer": { "@type": "Answer", "text": "Services return an appropriate HTTP error code. Payment is not settled on non-2xx responses, so failed calls are not charged." } },
     { "@type": "Question", "name": "Who built this?", "acceptedAnswer": { "@type": "Answer", "text": "Sean Melis (sean@melis.ai), AI agent operator and builder based in London, UK. Part of the melis.ai agent infrastructure stack." } },
@@ -19,6 +19,8 @@ const faqSchema = {
     { "@type": "Question", "name": "What is the difference between PromptGuard and MEMSCRUB?", "acceptedAnswer": { "@type": "Answer", "text": "PromptGuard ($0.002) scans direct user input for prompt injection attacks before they reach the LLM — jailbreaks, role overrides, privilege escalation. MEMSCRUB ($0.001) scans retrieved content from external sources — RAG chunks, tool outputs, scraped text — for indirect injection attacks: HTML comment injection, invisible Unicode, fake system messages, exfiltration instructions. Use both in a safety pipeline: PromptGuard on the way in, MEMSCRUB on each retrieved document before context assembly." } },
     { "@type": "Question", "name": "Can I use MemoryServe without EmbedPay?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. If you already have a vector, pass it directly in the vector field of the /memory/write request and MemoryServe will skip the EmbedPay call. This is useful if you are using your own embedding model or a different provider. When a vector is not supplied, MemoryServe calls EmbedPay automatically using openai-3-small (1536 dimensions, cl100k_base tokenisation, $0.00005 per 1k tokens)." } },
     { "@type": "Question", "name": "What does a full x402 RAG pipeline cost?", "acceptedAnswer": { "@type": "Answer", "text": "For a 5k-token source page: ScrapePay $0.01 + MarkdownOpt $0.005 + EmbedPay $0.0003 + MemoryServe write $0.001 + MEMSCRUB $0.001 = approximately $0.017 total. Query cost (retrieval only): EmbedPay $0.0003 + MemoryServe query $0.001 + MEMSCRUB per chunk $0.001 = approximately $0.002 per query. All prices in USDC on Base." } },
+    { "@type": "Question", "name": "How does Loopwall prevent agent loops?", "acceptedAnswer": { "@type": "Answer", "text": "Loopwall is the orchestration spine for safe multi-agent chains. Call /issue at chain start ($0.001) to mint a signed Job Envelope with origin, max_hops, and USD budget cap. Then call /hop at each subsequent step ($0.0005) to validate against loop detection, hop-limit, and remaining budget. The envelope is cryptographically signed so any downstream agent can verify chain provenance without trusting the caller. Unlike in-process loop counters, Loopwall works across runtimes and organisations — any agent that can POST HTTP can participate in a protected chain." } },
+    { "@type": "Question", "name": "What's the difference between PromptGuard and xAudit?", "acceptedAnswer": { "@type": "Answer", "text": "PromptGuard ($0.002) scores INPUT strings for prompt injection risk before they reach the LLM — jailbreaks, role overrides, system prompt extraction. xAudit ($0.002) validates OUTPUT content for factual quality and returns a cryptographically signed certificate of the audit. Different layers of the safety stack: PromptGuard guards the entry, xAudit guards the exit. SchemaGate sits between them for structural validation. Use all three for end-to-end response safety." } },
   ],
 };
 ---
@@ -60,7 +62,7 @@ const faqSchema = {
           <p>
             MCP (Model Context Protocol) is the dominant agent integration layer, introduced by Anthropic.
             It lets AI agents call external tools as functions. With the melis x402 Tools MCP server
-            (<code>npx @melis-ai/x402-tools-mcp</code>), all 18 services become callable tools in any
+            (<code>npx @melis-ai/x402-tools-mcp</code>), all 22 services become callable tools in any
             MCP-aware agent environment — Claude Desktop, Cursor, Claude Code, Continue, and others.
           </p>
         </div>
@@ -79,7 +81,7 @@ const faqSchema = {
         <div class="faq-item">
           <h3>What happens if a call fails?</h3>
           <p>
-            Payment is not settled on failure. This is enforced at the SDK level across all 18 services.
+            Payment is not settled on failure. This is enforced at the SDK level across all 22 services.
             If the service returns anything other than HTTP 2xx with non-empty content, the x402 SDK
             does not settle the payment. This was a known bug in v1.0.0 (charge-on-failure was incorrectly
             triggered on any non-5xx, including 4xx errors). It was patched and the full fleet was rebuilt
@@ -155,7 +157,7 @@ const faqSchema = {
           <h3>How is this different from Orbis?</h3>
           <p>
             Orbis is an aggregator — it bundles thousands of services into a single marketplace. Useful
-            for breadth. melis x402 Tools is a curated set of 18 services, each security-audited, with
+            for breadth. melis x402 Tools is a curated set of 22 services, each security-audited, with
             charge-on-failure safety, SSRF hardening, and robots.txt enforcement. Orbis handles volume
             (40,800 calls/24h); melis handles correctness and safety for boring infrastructure tasks.
           </p>
@@ -196,7 +198,7 @@ const faqSchema = {
             agentsvc.io offers 20 utility tools at similar price points ($0.001–$0.008). The overlap
             is real. melis x402 Tools differentiates on security hardening (SSRF protection, robots.txt
             enforcement, charge-on-failure), composition documentation, and the MCP wrapper that gives
-            one-command access to all 18 services.
+            one-command access to all 22 services.
           </p>
         </div>
       </div>
@@ -263,7 +265,7 @@ const faqSchema = {
           <h3>What happens if a service is down?</h3>
           <p>
             Services return an appropriate HTTP error code. If the service is unreachable, your x402
-            client will not settle payment (no 2xx response). Last known fleet status: 18 green / 0 red
+            client will not settle payment (no 2xx response). Last known fleet status: 22 green / 0 red
             as of 2026-05-07. No SLA is published currently.
           </p>
         </div>

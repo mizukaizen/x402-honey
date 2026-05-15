@@ -753,6 +753,198 @@ export const services: Service[] = [
     failureBehaviour:
       'Returns HTTP 413 if any input exceeds 8,000 tokens. Returns HTTP 400 for empty or non-string inputs. Returns HTTP 503 if nomic-embed is requested but self-hosted backend is not configured. None of these settle payment.',
   },
+  {
+    slug: 'intentflow',
+    name: 'IntentFlow',
+    tagline: 'Context handoff relay for multi-agent delegation. Async, returns retrieve_url.',
+    description:
+      'POST a natural language intent and IntentFlow assigns a relay_id and dispatches the work for async processing. Returns a retrieve_url you can poll for the result. Use this as a clean boundary when one agent delegates work to another — no shared state, no in-process coupling, no framework lock-in. The relay model makes it trivial to chain agents across organisations, machines, or runtimes.',
+    price: 0.001,
+    priceLabel: '$0.001',
+    endpoint: 'https://intentflow.melis.ai/relay',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'ai',
+    composes: ['promptguard', 'memoryserve', 'loopwall'],
+    requestExample: {
+      intent: 'Summarise the latest Ethereum gas prices and suggest a low-fee window today',
+    },
+    responseExample: {
+      relay_id: 'rly_7ea9afac-c3d1-4b2e-9f3a-1234abcd5678',
+      retrieve_url: 'https://intentflow.melis.ai/retrieve/rly_7ea9afac-c3d1-4b2e-9f3a-1234abcd5678',
+      status: 'queued',
+      payment_hash: '0x...',
+    },
+    alternatives: [
+      {
+        name: 'In-process function call',
+        notes:
+          'Direct function calls couple agents in the same runtime. IntentFlow is the right choice when the receiving agent runs in a different process, machine, or org — the retrieve_url pattern lets the caller move on while work happens async.',
+      },
+      {
+        name: 'Inngest / Trigger.dev / Temporal',
+        notes:
+          'Inngest, Trigger.dev, and Temporal are full workflow runtimes with retries, durability, and dashboards. IntentFlow is a pay-per-call relay — no account, no infrastructure, just an HTTP POST. Use the workflow runtimes when you need durability guarantees; use IntentFlow for lightweight agent-to-agent handoffs.',
+      },
+    ],
+    scenarios: [
+      'A planning agent dispatches research subtasks to a fleet of research agents',
+      'Multi-stage workflows where each stage runs in a different runtime',
+      'Async work where the caller does not need to block on the result',
+      'Cross-organisation agent collaboration with a clean payment boundary',
+    ],
+    rateLimit: 'None published.',
+    failureBehaviour:
+      'Returns HTTP 400 if intent is missing or empty. Returns HTTP 503 if the dispatch queue is unavailable. No settlement on any non-2xx response.',
+  },
+  {
+    slug: 'xaudit',
+    name: 'xAudit',
+    tagline: 'API response quality validation with cryptographic certificates.',
+    description:
+      'POST content with a claim_type and receive a validation verdict, a confidence score, and a signed certificate of the audit result. Use before consuming third-party API output or LLM-generated facts — verify integrity before injecting into your agent\'s reasoning loop. The signed certificate lets downstream consumers verify the audit independently. Pairs well with SchemaGate (structural validation) and PromptGuard (injection detection) for end-to-end response safety.',
+    price: 0.002,
+    priceLabel: '$0.002',
+    endpoint: 'https://xaudit.melis.ai/validate',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'validate',
+    composes: ['schemagate', 'promptguard', 'memscrub'],
+    requestExample: {
+      content: 'Australia\'s capital is Sydney.',
+      claim_type: 'factual',
+    },
+    responseExample: {
+      verdict: 'invalid',
+      confidence: 0.97,
+      reasoning: 'Australia\'s capital is Canberra, not Sydney.',
+      certificate: 'cert_8a3f...signed',
+      payment_hash: '0x...',
+    },
+    alternatives: [
+      {
+        name: 'SchemaGate',
+        notes:
+          'SchemaGate validates structure (does the JSON match the schema?). xAudit validates content (is the claim accurate?). They target different failure modes — use both for a full response-safety pipeline.',
+      },
+      {
+        name: 'PromptGuard',
+        notes:
+          'PromptGuard checks input strings for injection signals. xAudit checks output content for factual integrity. Different layer of the safety stack.',
+      },
+    ],
+    scenarios: [
+      'Validate facts in LLM-generated content before publishing',
+      'Audit third-party API responses before consuming downstream',
+      'Gate tool-call outputs against factual claims in a research workflow',
+      'Generate signed audit certificates for compliance trails',
+    ],
+    rateLimit: 'None published.',
+    failureBehaviour: 'Returns HTTP 400 if content is missing or claim_type is unrecognised. No settlement on any non-2xx response.',
+  },
+  {
+    slug: 'kyaoracle',
+    name: 'KYA Oracle',
+    tagline: 'Know-Your-Address: on-chain trust score for any Ethereum/Base wallet.',
+    description:
+      'POST a 0x wallet address and receive a 0-100 trust score with an optional signal breakdown. Uses on-chain history — wallet age, activity patterns, transaction graph proximity to flagged addresses, and known-risk heuristics. Use before any on-chain interaction with an unknown counterparty: token transfers, contract calls, x402 payments to non-fleet endpoints. Cheaper, faster, and pay-per-call where commercial alternatives charge per-seat subscriptions.',
+    price: 0.005,
+    priceLabel: '$0.005',
+    endpoint: 'https://kyaoracle.melis.ai/score',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'safety',
+    composes: ['linkrisk', 'promptguard'],
+    requestExample: {
+      address: '0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC',
+      include_detail: true,
+    },
+    responseExample: {
+      address: '0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC',
+      trust_score: 87,
+      risk_level: 'low',
+      signals: {
+        wallet_age_days: 96,
+        tx_count: 412,
+        flagged_proximity: 0,
+        sanctions_match: false,
+      },
+      scored_at: '2026-05-15T12:00:00Z',
+      payment_hash: '0x...',
+    },
+    alternatives: [
+      {
+        name: 'Chainalysis / TRM Labs',
+        notes:
+          'Chainalysis and TRM Labs are enterprise-grade with broader coverage, deeper graph analysis, and regulator-grade reporting — but require account, contract, and seat licensing. KYA Oracle is x402-native pay-per-call at $0.005 with no signup. Use Chainalysis when you need court-defensible reports; use KYA Oracle for agent-time risk gating.',
+      },
+      {
+        name: 'LinkRisk',
+        notes:
+          'LinkRisk profiles URLs (off-chain). KYA Oracle profiles wallet addresses (on-chain). Different surfaces — pair them when an agent is acting on both web and blockchain inputs.',
+      },
+    ],
+    scenarios: [
+      'Screen a counterparty wallet before sending tokens or executing a contract call',
+      'Reputation gate for x402 payments to non-fleet endpoints',
+      'Compliance check in an agent-driven payments pipeline',
+      'Pre-flight check for any DeFi interaction with an unknown protocol',
+    ],
+    rateLimit: 'None published.',
+    failureBehaviour: 'Returns HTTP 400 for malformed addresses (must be 0x + 40 hex chars). Returns HTTP 503 if the on-chain data backend is unavailable. No settlement on any non-2xx response.',
+  },
+  {
+    slug: 'loopwall',
+    name: 'Loopwall',
+    tagline: 'Recursive loop firewall + budget provenance for multi-agent chains.',
+    description:
+      'Multi-agent chains can loop infinitely and burn budgets unnoticed. Loopwall is the spine of safe x402 orchestration: call /issue at chain start to mint a signed Job Envelope ($0.001) with origin, max_hops, and USD budget cap; then call /hop at each subsequent step ($0.0005) to validate against loop detection, hop-limit, and remaining budget. The envelope is cryptographically signed so any downstream agent can verify chain provenance without trusting the caller. Use as the orchestration backbone for any LLM-driven workflow that calls paid services.',
+    price: 0.0005,
+    priceLabel: '$0.0005',
+    priceDisplay: '$0.001 issue + $0.0005 / hop',
+    endpoint: 'https://loopwall.melis.ai/issue',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'safety',
+    composes: ['intentflow', 'kyaoracle', 'promptguard'],
+    requestExample: {
+      origin: 'planner-agent-v1',
+      max_hops: 10,
+      budget_usd: 1.0,
+    },
+    responseExample: {
+      envelope_id: 'env_7ea9afac-c3d1-4b2e-9f3a-1234abcd5678',
+      origin: 'planner-agent-v1',
+      max_hops: 10,
+      hops_remaining: 10,
+      budget_usd: 1.0,
+      budget_remaining_usd: 1.0,
+      signature: '0xabc...',
+      issued_at: '2026-05-15T12:00:00Z',
+      payment_hash: '0x...',
+    },
+    alternatives: [
+      {
+        name: 'In-process loop counter',
+        notes:
+          'A local counter works inside one runtime but cannot enforce budget or chain provenance across agent handoffs. Loopwall signs the envelope so any agent in the chain can verify limits without trusting the caller — the right fit for cross-agent or cross-org orchestration.',
+      },
+      {
+        name: 'Workflow runtime limits (Inngest, Temporal)',
+        notes:
+          'Inngest and Temporal can enforce step limits within their own runtime. Loopwall is runtime-agnostic — any agent that can POST HTTP can participate in a Loopwall-protected chain regardless of framework.',
+      },
+    ],
+    scenarios: [
+      'Cap an LLM orchestrator at 10 paid x402 hops before manual review',
+      'Detect a planning agent recursively calling itself before it drains budget',
+      'Pass a signed budget envelope across agents in different organisations',
+      'Audit trail of which agent in a chain consumed which fraction of the budget',
+    ],
+    rateLimit: 'None published.',
+    failureBehaviour:
+      '/issue returns HTTP 400 for invalid max_hops or budget_usd. /hop returns HTTP 409 if the envelope has already exceeded its hop limit or budget; HTTP 410 if the envelope signature is invalid or expired. None of these settle payment.',
+  },
 ];
 
 export function getService(slug: string): Service | undefined {
