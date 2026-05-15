@@ -126,7 +126,7 @@ export const GET: APIRoute = () => {
       title: 'melis x402 Tools',
       version: '1.0.0',
       description:
-        '20 pay-per-call x402 utility APIs for AI agents. All endpoints charge USDC on Base via the x402 protocol (HTTP 402). No accounts, no API keys, no subscriptions. Payment settles in ~2 seconds on Base (Coinbase L2).\n\nInstall the MCP wrapper: `npx @melis-ai/x402-tools-mcp`\n\nDocs: https://agents.melis.ai',
+        '22 pay-per-call x402 utility APIs for AI agents. All endpoints charge USDC on Base via the x402 protocol (HTTP 402). No accounts, no API keys, no subscriptions. Payment settles in ~2 seconds on Base (Coinbase L2).\n\nInstall the MCP wrapper: `npx @melis-ai/x402-tools-mcp`\n\nDocs: https://agents.melis.ai',
       contact: {
         name: 'Sean Melis',
         email: 'sean@melis.ai',
@@ -141,10 +141,11 @@ export const GET: APIRoute = () => {
     paths,
     tags: [
       { name: 'web', description: 'Web scraping, screenshots, and research' },
-      { name: 'safety', description: 'URL risk, prompt injection, and safety checks' },
+      { name: 'safety', description: 'URL risk, prompt injection, image moderation, wallet trust scoring, agent loop prevention' },
       { name: 'notify', description: 'Notifications via email, Telegram, and webhook' },
       { name: 'convert', description: 'Document and format conversion' },
-      { name: 'validate', description: 'Schema and output validation' },
+      { name: 'validate', description: 'Schema, output, and content validation with signed certificates' },
+      { name: 'ai', description: 'Embeddings, semantic memory, and multi-agent context relay' },
     ],
     components: {
       schemas: {

@@ -13,7 +13,7 @@
   <text x="80" y="300" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="56" font-weight="700" fill="#E5E7EB">Boring infrastructure</text>
   <text x="80" y="370" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="56" font-weight="700" fill="#E5E7EB">for AI agents.</text>
   <!-- Sub -->
-  <text x="80" y="430" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="24" fill="#6B7280">16 x402-paid utility APIs · USDC on Base · No accounts</text>
+  <text x="80" y="430" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="24" fill="#6B7280">22 x402-paid utility APIs · USDC on Base · No accounts</text>
   <!-- Bottom bar -->
   <rect x="0" y="590" width="1200" height="40" fill="rgba(168,85,247,0.08)"/>
   <text x="80" y="615" font-family="monospace" font-size="16" fill="#a855f7">agents.melis.ai</text>

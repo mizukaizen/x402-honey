@@ -7,7 +7,7 @@ const sorted = [...services].sort((a, b) => a.price - b.price);
 
 <Layout
   title="Pricing"
-  description="All 16 melis x402 utility API prices. $0.001 to $0.49 per call. Pay per call in USDC on Base. No subscriptions, no minimum spend."
+  description="All 22 melis x402 utility API prices. $0.0005 to $0.49 per call. Pay per call in USDC on Base. No subscriptions, no minimum spend."
 >
   <div class="container" style="padding-top:4rem;padding-bottom:4rem;">
     <h1>Pricing</h1>
@@ -49,7 +49,7 @@ const sorted = [...services].sort((a, b) => a.price - b.price);
         <li>
           <strong>Charge-on-failure-safe.</strong> Payment only settles when the service returns HTTP 2xx with
           non-empty content. If the call fails, you are not charged. This is enforced at the SDK level
-          across all 20 services (fleet rebuilt 2026-05-07).
+          across all 22 services (4 additional services listed 2026-05-15).
         </li>
         <li>
           <strong>No accounts.</strong> x402 is account-less. Your wallet signs the payment header; the service
