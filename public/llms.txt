@@ -21,7 +21,7 @@ Fleet status: 22 green / 0 red (last audited 2026-05-15)
 - [MemoryServe](https://memoryserve.melis.ai/memory/write): Semantic agent memory — Qdrant vector store + SQLite metadata · $0.001
 - [NotifyRelay /webhook](https://notify.melis.ai/webhook): POST JSON to any public URL (HMAC-signed) · $0.001
 - [SchemaGate](https://schemagate.melis.ai/validate-schema): Validate LLM output against JSON Schema · $0.001
-- [ImageGuard](https://imageguard.melis.ai/score): NSFW/violence/weapons/hate/self-harm scoring · $0.002
+- [ImageGuard](https://imageguard.melis.ai/score): NSFW image classification — score adult/explicit content before publishing · $0.002
 - [NotifyRelay /notify](https://notify.melis.ai/notify): Send Telegram message · $0.002
 - [PromptGuard](https://promptguard.melis.ai/score): Prompt injection risk score (0–100) · $0.002
 - [StructExtract](https://structextract.melis.ai/extract): HTML → structured JSON (tables, links, emails, phones) · $0.002
