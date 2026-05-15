@@ -10,6 +10,7 @@ export interface Service {
   wallet: 'microservices' | 'molt';
   category: 'web' | 'safety' | 'notify' | 'convert' | 'validate' | 'ai';
   priceDisplay?: string; // override for non-per-call pricing display
+  demoSpace?: string;  // HuggingFace Space URL for a free rate-limited live demo
   composes: string[];  // slugs of related services
   requestExample: object;
   responseExample: object;
@@ -37,6 +38,7 @@ export const services: Service[] = [
     method: 'POST',
     wallet: 'microservices',
     category: 'web',
+    demoSpace: 'https://huggingface.co/spaces/seanmelis/melis-x402-scrapepay',
     composes: ['markdownopt', 'structextract', 'linkrisk', 'promptguard'],
     requestExample: {
       url: 'https://example.com/article',
@@ -93,6 +95,7 @@ export const services: Service[] = [
     method: 'POST',
     wallet: 'microservices',
     category: 'web',
+    demoSpace: 'https://huggingface.co/spaces/seanmelis/melis-x402-markdownopt',
     composes: ['scrapepay', 'promptguard', 'schemagate'],
     requestExample: {
       url: 'https://example.com/article',
@@ -712,6 +715,7 @@ export const services: Service[] = [
     price: 0.00005,
     priceLabel: '$0.00005',
     priceDisplay: '$0.0001 / 1k tokens',
+    demoSpace: 'https://huggingface.co/spaces/seanmelis/melis-x402-embedpay',
     endpoint: 'https://embedpay.melis.ai/embed',
     method: 'POST',
     wallet: 'microservices',

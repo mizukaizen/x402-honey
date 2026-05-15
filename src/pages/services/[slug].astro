@@ -116,6 +116,18 @@ const basescanUrl = `https://basescan.org/address/${walletAddr}#tokentxns`;
           </div>
         </div>
 
+        {service.demoSpace && (
+          <div class="demo-banner">
+            <span class="demo-badge">Live demo</span>
+            <span>
+              Try {service.name} free (rate-limited) on{' '}
+              <a href={service.demoSpace} target="_blank" rel="noopener">
+                Hugging Face Spaces
+              </a>{' '}— no wallet needed. Also callable as an MCP tool directly from the Space.
+            </span>
+          </div>
+        )}
+
         <!-- Overview -->
         <section id="overview">
           <h2>What it does</h2>
@@ -267,6 +279,38 @@ print(resp.json())`}</code></pre>
 <style>
 .page-wrap {
   padding: 4rem 0;
+}
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.875rem 1.125rem;
+  margin: 1.5rem 0;
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.demo-badge {
+  background: var(--teal);
+  color: #0A0A0A;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.demo-banner a {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .service-layout {
