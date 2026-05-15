@@ -48,5 +48,8 @@ Fleet status: 22 green / 0 red (last audited 2026-05-15)
 
 - [npm package](https://www.npmjs.com/package/@melis-ai/x402-tools-mcp): open-source MCP wrapper (MIT)
 - [GitHub](https://github.com/mizukaizen/x402-tools-mcp): MCP wrapper source code
+- [HuggingFace Space — ScrapePay demo](https://huggingface.co/spaces/seanmelis/melis-x402-scrapepay): free rate-limited live demo, also an MCP server
+- [HuggingFace Space — EmbedPay demo](https://huggingface.co/spaces/seanmelis/melis-x402-embedpay): free rate-limited live demo, also an MCP server
+- [HuggingFace Space — MarkdownOpt demo](https://huggingface.co/spaces/seanmelis/melis-x402-markdownopt): free rate-limited live demo, also an MCP server
 - [Basescan — microservices wallet](https://basescan.org/address/0x1C680703D6cF7dfC9FEABb5AA28E64B869ddB3bC#tokentxns): live payment transparency
 - [Basescan — Molt Swarm wallet](https://basescan.org/address/0x61F2eF18ab0630912D24Fd0A30288619735AfFf5#tokentxns): live payment transparency
