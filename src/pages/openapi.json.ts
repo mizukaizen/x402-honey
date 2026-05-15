@@ -11,7 +11,16 @@ function jsonSchemaFromExample(example: object): object {
     } else if (typeof value === 'boolean') {
       properties[key] = { type: 'boolean', example: value };
     } else if (Array.isArray(value)) {
-      properties[key] = { type: 'array', items: { type: 'object' }, example: value };
+      // Detect item type from the first element so the schema matches the example.
+      // Without this, spectral's oas3-valid-schema-example fails when items.type
+      // defaults to 'object' but examples are primitives (e.g. flags: ['foo']).
+      const first = value[0];
+      let itemType: string;
+      if (typeof first === 'string') itemType = 'string';
+      else if (typeof first === 'number') itemType = 'number';
+      else if (typeof first === 'boolean') itemType = 'boolean';
+      else itemType = 'object';
+      properties[key] = { type: 'array', items: { type: itemType }, example: value };
     } else if (value !== null && typeof value === 'object') {
       properties[key] = { type: 'object', example: value };
     } else {
@@ -37,22 +46,36 @@ export const GET: APIRoute = () => {
   }
   const servers = [...serverSet].map((url) => ({ url, description: `${url.replace('https://', '')} service` }));
 
-  // Build paths
+  // Build paths.
+  //
+  // Path keys are namespaced as `/<slug><real-path>` (e.g. `/promptguard/score`)
+  // because multiple services share the same path on different subdomains
+  // (/score: promptguard, imageguard, kyaoracle | /convert: docconvert-text,
+  // docconvert-pdf). OpenAPI's paths object requires unique keys, so a raw
+  // `/score` key would collapse three services into one. Each path carries:
+  //
+  //  - a path-level `servers` override → the real service subdomain
+  //  - `x-real-path` extension → the actual URL path to POST to
+  //
+  // Smart consumers join `servers[0].url + x-real-path` to get the real URL;
+  // catalogue-style consumers can list every entry without collisions.
   const paths: Record<string, object> = {};
   for (const svc of services) {
-    const { path } = endpointPath(svc.endpoint);
+    const { server, path } = endpointPath(svc.endpoint);
+    const namespacedPath = `/${svc.slug}${path}`;
     const operationId = svc.slug.replace(/-/g, '_');
 
     const requestSchema = jsonSchemaFromExample(svc.requestExample);
     const responseSchema = jsonSchemaFromExample(svc.responseExample);
 
-    paths[path] = {
+    paths[namespacedPath] = {
+      servers: [{ url: server }],
+      'x-real-path': path,
       post: {
         operationId,
         summary: svc.tagline,
-        description: `${svc.description}\n\nPrice: ${svc.priceLabel} USDC per call via x402 protocol on Base. Rate limit: ${svc.rateLimit}`,
+        description: `${svc.description}\n\nReal endpoint: \`POST ${svc.endpoint}\`\nPrice: ${svc.priceLabel} USDC per call via x402 protocol on Base. Rate limit: ${svc.rateLimit}`,
         tags: [svc.category],
-        servers: [{ url: endpointPath(svc.endpoint).server }],
         requestBody: {
           required: true,
           content: {
