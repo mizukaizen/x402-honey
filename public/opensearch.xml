@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                      xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>melis x402 Tools</ShortName>
+  <LongName>Search 22 pay-per-call x402 utility APIs for AI agents</LongName>
+  <Description>Search the melis x402 Tools catalogue — scrape, validate, embed, store, moderate, notify, convert, RAG, agent memory. USDC on Base, no accounts.</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/svg+xml">https://agents.melis.ai/favicon.svg</Image>
+  <Image width="400" height="400" type="image/png">https://github.com/mizukaizen/x402-tools-mcp/raw/main/assets/logo-400.png</Image>
+  <Url type="text/html"
+       method="get"
+       template="https://agents.melis.ai/services?q={searchTerms}" />
+  <moz:SearchForm>https://agents.melis.ai/services</moz:SearchForm>
+  <Tags>x402 mcp ai-agents pay-per-call usdc base llm-tools rag embeddings</Tags>
+  <Contact>sean@melis.ai</Contact>
+  <Developer>Sean Melis</Developer>
+  <Attribution>Copyright Melis AI. Content licensed CC-BY-4.0.</Attribution>
+  <SyndicationRight>open</SyndicationRight>
+  <AdultContent>false</AdultContent>
+  <Language>en-GB</Language>
+  <OutputEncoding>UTF-8</OutputEncoding>
+</OpenSearchDescription>
