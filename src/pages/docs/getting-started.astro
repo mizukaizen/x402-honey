@@ -1,0 +1,113 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="Getting Started — Pay-per-call AI agent tools in 5 minutes"
+  description="Five-minute onboarding for melis x402 Tools. Install the MCP wrapper, fund a Base wallet with $1 of USDC, make your first paid scrape. No signup, no API key."
+  breadcrumbs={[{ name: 'Docs', url: 'https://agents.melis.ai/docs/install-mcp' }, { name: 'Getting Started', url: 'https://agents.melis.ai/docs/getting-started' }]}
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <a href="/docs/install-mcp" class="doc-nav-link">← Docs</a>
+      <h1>Getting started in five minutes</h1>
+      <p class="doc-sub">
+        Three steps. Install the MCP wrapper, fund a Base wallet with $1 of USDC,
+        make your first paid call. No signup, no API key.
+      </p>
+    </div>
+
+    <section>
+      <h2>1 · Install the MCP wrapper</h2>
+      <p>
+        <code>@melis-ai/x402-tools-mcp</code> is the single command that gives any MCP-aware
+        agent access to all 22 melis services as tool calls. Runs in Claude Desktop, Cursor,
+        Cline, Continue, Claude Code, or any other MCP client.
+      </p>
+      <pre><code>npx @melis-ai/x402-tools-mcp</code></pre>
+      <p>
+        On first run, the wrapper prints its tool catalogue. Configure your client to point
+        at the binary — see the <a href="/docs/install-mcp">full install guide</a> for
+        Claude Desktop, Cursor, and the others.
+      </p>
+    </section>
+
+    <section>
+      <h2>2 · Fund a Base wallet with USDC</h2>
+      <p>
+        x402 settlement happens in USDC on Base (Coinbase L2). Two routes:
+      </p>
+      <ul>
+        <li>
+          <strong>Coinbase Wallet</strong> — buy USDC, switch to Base network, send to your
+          agent's wallet address. <a href="https://wallet.coinbase.com" target="_blank" rel="noopener">wallet.coinbase.com</a>
+        </li>
+        <li>
+          <strong>Bridge from Ethereum mainnet</strong> — if you have USDC on L1, bridge via
+          <a href="https://bridge.base.org" target="_blank" rel="noopener">bridge.base.org</a>.
+          Settlement: ~10 minutes.
+        </li>
+      </ul>
+      <p>
+        $1.00 of USDC covers 100 ScrapePay calls, 200 PromptGuard calls, or one full RAG
+        pipeline page-ingestion run. No minimum balance, no subscription.
+      </p>
+    </section>
+
+    <section>
+      <h2>3 · Make your first paid call</h2>
+      <p>Raw curl from a terminal — no agent framework needed for the proof of life:</p>
+      <pre><code>{`# 1. Hit ScrapePay with no payment header → returns 402 with a signed payment quote
+curl -i -X POST https://scrapepay.melis.ai/scrape \\
+  -H "Content-Type: application/json" \\
+  -d '{"url":"https://example.com","format":"markdown"}'
+
+# Response: HTTP/2 402
+# {"x402Version":1,"accepts":[{"scheme":"exact","network":"base",
+#   "maxAmountRequired":"10000","payTo":"0x1C68...B3bC", ... }]}
+
+# 2. Your wallet client signs an EIP-3009 USDC transferAuth header
+#    and retries. The MCP wrapper does this automatically — for raw curl,
+#    use the @coinbase/x402-axios SDK or x402-fetch from the x402 GitHub org.
+
+# 3. On success: HTTP 200 with the scraped content + a payment_hash receipt.`}</code></pre>
+      <p>
+        From an agent: just call the <code>scrapepay</code> tool through MCP. The wrapper
+        handles the 402 → sign → retry loop transparently. Your agent code is one tool call,
+        not three.
+      </p>
+    </section>
+
+    <section>
+      <h2>What to build next</h2>
+      <ul>
+        <li><a href="/pipelines/rag">Canonical RAG pipeline</a> — 5 services, $0.017 per page</li>
+        <li><a href="/compose">Composition recipes</a> — 7 worked workflows</li>
+        <li><a href="/services">All 22 services</a> — full catalogue with prices</li>
+        <li><a href="/docs/x402-payment">x402 protocol deep dive</a> — settlement details</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Need help?</h2>
+      <p>
+        Email <a href="mailto:sean@melis.ai">sean@melis.ai</a> — Sean reads every message
+        personally and replies within a working day. For high-volume access, ask about an
+        internal key that bypasses the per-call x402 flow.
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .doc-page { padding-top: 4rem; padding-bottom: 5rem; max-width: 760px; }
+    .doc-header { margin-bottom: 3rem; }
+    .doc-nav-link { font-size: 13px; color: var(--text-3); }
+    h1 { font-size: 2rem; margin: 0.5rem 0 1rem; }
+    .doc-sub { color: var(--text-2); font-size: 1rem; line-height: 1.7; max-width: 640px; }
+    section { margin-bottom: 2.5rem; }
+    section h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+    section p, section li { color: var(--text-2); line-height: 1.7; font-size: 15px; }
+    section ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    pre { margin: 1rem 0; font-size: 13px; }
+  </style>
+</Layout>

@@ -2,17 +2,14 @@
 import Layout from '../components/Layout.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import LiveBadge from '../components/LiveBadge.astro';
-import SchemaOrg from '../components/SchemaOrg.astro';
 import { services } from '../data/services';
 ---
 
 <Layout
   title="melis x402 Tools — Boring infrastructure for AI agents"
   description="22 pay-per-call x402 utility APIs for AI agents. Scrape, validate, embed, guard, remember, score wallets, prevent loops. No accounts, no API keys. Pay per call in USDC on Base."
+  schemaType="landing"
 >
-  <Fragment slot="head">
-    <SchemaOrg type="landing" />
-  </Fragment>
 
   <!-- Hero -->
   <section class="hero">

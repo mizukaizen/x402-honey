@@ -1,0 +1,86 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="Agent Memory Use Case — Pay-per-call vector store for agent runtimes"
+  description="Add persistent semantic memory to any agent: MemoryServe ($0.001/op) + EmbedPay ($0.00005/1k tokens). Per-agent isolation, GDPR-compliant deletion, no signup, x402 USDC on Base."
+  breadcrumbs={[{ name: 'Use cases', url: 'https://agents.melis.ai/use-cases/agent-memory' }, { name: 'Agent memory', url: 'https://agents.melis.ai/use-cases/agent-memory' }]}
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <h1>Use case: agent memory</h1>
+      <p class="doc-sub">
+        Persistent, semantic, per-agent memory with no signup and no infra to provision.
+      </p>
+    </div>
+
+    <section>
+      <h2>The problem</h2>
+      <p>
+        Most agent runtimes lose context between sessions. Adding persistent memory means
+        either provisioning a vector database (Pinecone, Qdrant Cloud, Weaviate), wiring an
+        embeddings provider (OpenAI account + key), and managing per-tenant isolation — or
+        accepting goldfish-memory agents.
+      </p>
+    </section>
+
+    <section>
+      <h2>The composition</h2>
+      <pre><code>{`# Write
+POST embedpay.melis.ai/embed   {"input": "<text>"}  →  vector (1536d)
+POST memoryserve.melis.ai/memory/write
+     {"agent_id": "<id>", "content": "<text>", "vector": <...>}
+
+# Recall
+POST embedpay.melis.ai/embed   {"input": "<query>"}  →  vector
+POST memoryserve.melis.ai/memory/query
+     {"agent_id": "<id>", "vector": <...>, "top_k": 5}
+   →  list of {content, score, tags, created_at}
+
+# Optional: scrub each retrieved chunk before LLM injection
+POST memscrub.melis.ai/scrub   {"content": "<chunk>"}  →  risk_score`}</code></pre>
+    </section>
+
+    <section>
+      <h2>The cost</h2>
+      <ul>
+        <li>Write: ~$0.0013 per memory ($0.0003 EmbedPay + $0.001 MemoryServe)</li>
+        <li>Query: ~$0.0023 per recall ($0.0003 EmbedPay + $0.001 MemoryServe + $0.001 MEMSCRUB on each retrieved chunk)</li>
+        <li>Bring your own vector and skip EmbedPay: cost drops to $0.001 (write) and $0.002 (query+scrub)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Why melis</h2>
+      <ul>
+        <li>Per-agent isolation via <code>agent_id</code> — no shared index, no leakage between tenants</li>
+        <li>Free GDPR delete: <code>DELETE /memory/agent/{`{id}`}</code> wipes everything for an agent</li>
+        <li>BYO vector option — drop EmbedPay if you already have an embedding</li>
+        <li>MEMSCRUB gates retrieved chunks against indirect prompt injection — important for agent runtimes that ingest untrusted content</li>
+        <li>No signup, no API key, no infra. Wallet address is the identity.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Related</h2>
+      <p>
+        <a href="/pipelines/rag">Canonical RAG pipeline</a> · <a href="/services/memoryserve">MemoryServe</a> ·
+        <a href="/services/embedpay">EmbedPay</a> · <a href="/services/memscrub">MEMSCRUB</a> ·
+        <a href="/comparison/vs-pinecone">vs Pinecone</a>
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .doc-page { padding-top: 4rem; padding-bottom: 5rem; max-width: 800px; }
+    .doc-header { margin-bottom: 3rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .doc-sub { color: var(--text-2); font-size: 1rem; line-height: 1.7; max-width: 720px; }
+    section { margin-bottom: 2.25rem; }
+    section h2 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+    section p, section li { color: var(--text-2); line-height: 1.7; font-size: 15px; }
+    section ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    pre { font-size: 13px; }
+  </style>
+</Layout>

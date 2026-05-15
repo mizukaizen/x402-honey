@@ -1,0 +1,124 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="ScrapePay vs Firecrawl — Pay-per-call web scraping for AI agents"
+  description="Honest comparison: ScrapePay (x402, no signup, $0.01/call, robots.txt-enforced, charge-on-success) vs Firecrawl (account + API key, subscription tiers, faster at scale, polished). When each one wins."
+  breadcrumbs={[{ name: 'Comparison', url: 'https://agents.melis.ai/comparison/vs-firecrawl' }, { name: 'vs Firecrawl', url: 'https://agents.melis.ai/comparison/vs-firecrawl' }]}
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <h1>ScrapePay vs Firecrawl</h1>
+      <p class="doc-sub">
+        Both are web-scraping APIs for AI agents. ScrapePay is x402-native pay-per-call,
+        no signup. Firecrawl is account-based with subscription tiers. Use this page to
+        pick the right one for your workload — honest tradeoffs, not marketing copy.
+      </p>
+    </div>
+
+    <section>
+      <h2>At a glance</h2>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th><a href="/services/scrapepay">ScrapePay</a></th>
+              <th>Firecrawl</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Signup required</td><td>No — wallet address is your identity</td><td>Yes — account + API key</td></tr>
+            <tr><td>Pricing model</td><td>$0.010 USDC per successful call</td><td>Subscription tiers ($16–$333/mo) + credit-based</td></tr>
+            <tr><td>Charge-on-failure</td><td>Never — settlement only on HTTP 2xx with non-empty content</td><td>Credits consumed regardless of outcome on most plans</td></tr>
+            <tr><td>robots.txt enforcement</td><td>Mandatory — 451 with no charge if disallowed</td><td>Optional / user-configurable</td></tr>
+            <tr><td>SSRF guard</td><td>Built in: DNS validation + private-IP blocklist</td><td>Built in</td></tr>
+            <tr><td>JS rendering</td><td>Playwright headless Chromium</td><td>Playwright + chromium fleet</td></tr>
+            <tr><td>Scale ceiling</td><td>Pay-per-call linear scale; no published rate cap</td><td>Higher concurrency on paid tiers</td></tr>
+            <tr><td>MCP integration</td><td>Native via <code>@melis-ai/x402-tools-mcp</code></td><td>Via community wrappers</td></tr>
+            <tr><td>Output formats</td><td>text · html · markdown</td><td>markdown · html · structured · screenshots</td></tr>
+            <tr><td>Composability</td><td>Designed to chain with MarkdownOpt, EmbedPay, MemoryServe</td><td>Standalone</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Choose ScrapePay when</h2>
+      <ul>
+        <li>You don't want to manage an API key in your agent runtime.</li>
+        <li>Low or unpredictable volume — pay-per-call beats a subscription you might not amortise.</li>
+        <li>Charge-on-success matters — failed scrapes (JS crash, timeout, empty page, robots.txt disallow) cost nothing.</li>
+        <li>You're building a composed pipeline (RAG ingest, content moderation, agent memory) and want each step independently billed and verifiable on-chain.</li>
+        <li>Your agent operates across multiple users/orgs and account-per-customer isn't workable.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Choose Firecrawl when</h2>
+      <ul>
+        <li>High and predictable volume — the $333/mo tier is cheaper per-call than ScrapePay above ~3,300 calls/day.</li>
+        <li>You need its specialised features — structured extraction, deep-crawl, screenshot bundles, content change tracking — at production polish.</li>
+        <li>Your stack is account-and-key-shaped and adding a Base wallet would be more friction than just provisioning a key.</li>
+        <li>You want a polished dashboard for billing, usage analytics, and rate-limit visibility.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>When both make sense</h2>
+      <p>
+        Some teams use ScrapePay for the long tail (one-off URLs, agent-spawned scrapes,
+        unknown-volume workloads) and Firecrawl for the hot path (their main product's
+        scraping budget). The x402 protocol makes it trivial to swap between providers
+        per-call — different agents in the same workflow can use different scrape backends.
+      </p>
+    </section>
+
+    <section>
+      <h2>What we won't claim</h2>
+      <ul>
+        <li>ScrapePay is not faster than Firecrawl at p99 — Firecrawl's hot fleet handles burst traffic better.</li>
+        <li>ScrapePay's output quality on JS-heavy pages is comparable but not provably superior — both use Playwright.</li>
+        <li>ScrapePay does not handle deep crawls (multi-page sitemaps) natively — Firecrawl does.</li>
+      </ul>
+      <p>
+        For pages where ScrapePay's UA is blocked by the upstream (some CDNs and a few
+        large news sites), ScrapePay returns 422 with no charge. Falling back to Firecrawl
+        or a different scraper at that point is the right move.
+      </p>
+    </section>
+
+    <section>
+      <h2>Try it</h2>
+      <p>
+        ScrapePay one-liner: <code>npx @melis-ai/x402-tools-mcp</code> then call the
+        <code>scrapepay</code> tool from your agent. Full details on the
+        <a href="/services/scrapepay">ScrapePay page</a> or the
+        <a href="/docs/getting-started">5-minute getting-started guide</a>.
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .doc-page { padding-top: 4rem; padding-bottom: 5rem; max-width: 880px; }
+    .doc-header { margin-bottom: 3rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .doc-sub { color: var(--text-2); font-size: 1rem; line-height: 1.7; max-width: 720px; }
+    section { margin-bottom: 2.5rem; }
+    section h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+    section p, section li { color: var(--text-2); line-height: 1.7; font-size: 15px; }
+    section ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .compare-table-wrap { overflow-x: auto; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .compare-table th, .compare-table td {
+      text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border-light);
+      color: var(--text-2); vertical-align: top;
+    }
+    .compare-table th {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-3); border-bottom: 1px solid var(--border);
+    }
+    .compare-table tr:hover td { background: var(--surface); }
+  </style>
+</Layout>

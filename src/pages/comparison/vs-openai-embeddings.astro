@@ -1,0 +1,124 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="EmbedPay vs OpenAI Embeddings — Wrapper costs vs direct API"
+  description="Honest comparison: EmbedPay (x402 wrapper, no signup, $0.00005/1k tokens) vs OpenAI Embeddings direct ($0.00002/1k, requires account + API key). The wrapper premium and when it's worth paying."
+  breadcrumbs={[{ name: 'Comparison', url: 'https://agents.melis.ai/comparison/vs-openai-embeddings' }, { name: 'vs OpenAI Embeddings', url: 'https://agents.melis.ai/comparison/vs-openai-embeddings' }]}
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <h1>EmbedPay vs OpenAI Embeddings (direct)</h1>
+      <p class="doc-sub">
+        EmbedPay is an x402 wrapper around the same OpenAI <code>text-embedding-3-small</code>
+        model. Direct OpenAI is cheaper per token but requires an account, API key, and rate-limit
+        management. EmbedPay's premium buys signup-free access with composable x402 billing.
+      </p>
+    </div>
+
+    <section>
+      <h2>At a glance</h2>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th><a href="/services/embedpay">EmbedPay</a></th>
+              <th>OpenAI Embeddings (direct)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Underlying model</td><td>text-embedding-3-small (1536d)</td><td>Same — text-embedding-3-small (1536d)</td></tr>
+            <tr><td>Signup required</td><td>No</td><td>Yes — OpenAI account + billing card + API key</td></tr>
+            <tr><td>Per 1k tokens (standard)</td><td>$0.00005 USDC</td><td>$0.00002 USD</td></tr>
+            <tr><td>Per 1k tokens (batch ≥100 inputs)</td><td>$0.00003 USDC</td><td>n/a — batch API has separate quota</td></tr>
+            <tr><td>Premium vs direct</td><td colspan="2"><strong>~2.5× direct rate.</strong> The premium covers x402 infrastructure + no signup convenience.</td></tr>
+            <tr><td>Token counting transparency</td><td>cl100k_base counted server-side, returned in <code>input_tokens</code> field — you can verify locally</td><td>Same tokenizer, count returned in usage block</td></tr>
+            <tr><td>Rate limits</td><td>600 req/min per IP · 10M tokens/IP/hour</td><td>Account-tier based (3k–10k+ RPM)</td></tr>
+            <tr><td>Model version pinning</td><td>Returned in response: <code>model_version: "text-embedding-3-small (2024-01-25)"</code></td><td>Implicit — OpenAI rev-locks behind the scenes</td></tr>
+            <tr><td>MCP integration</td><td>Native via <code>@melis-ai/x402-tools-mcp</code></td><td>Via OpenAI SDK wrappers</td></tr>
+            <tr><td>Multi-tenancy</td><td>Per-agent pay-per-call — no shared account</td><td>One account = one billing relationship</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Cost math at three volumes</h2>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr><th>Volume</th><th>EmbedPay</th><th>OpenAI direct</th><th>Premium</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1M tokens</td><td>$0.05</td><td>$0.02</td><td>+$0.03</td></tr>
+            <tr><td>100M tokens</td><td>$5.00</td><td>$2.00</td><td>+$3.00</td></tr>
+            <tr><td>1B tokens</td><td>$50.00</td><td>$20.00</td><td>+$30.00</td></tr>
+            <tr><td>1B tokens, batch tier</td><td>$30.00</td><td>$20.00</td><td>+$10.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        At ~1B tokens you're $30 better off direct — and at that scale you probably want
+        the dashboard, rate-limit insights, and support contract that come with an OpenAI
+        org. EmbedPay's sweet spot is below ~100M tokens/month where the operational
+        overhead of provisioning + securing an OpenAI key outweighs the price delta.
+      </p>
+    </section>
+
+    <section>
+      <h2>Choose EmbedPay when</h2>
+      <ul>
+        <li>You're building an agent that needs embeddings but you don't want to manage an OpenAI key.</li>
+        <li>Multi-tenant agent runtime where customers shouldn't share an OpenAI billing relationship.</li>
+        <li>You're already in the x402 ecosystem — same wallet pays for ScrapePay → MarkdownOpt → EmbedPay → MemoryServe.</li>
+        <li>Total volume under ~100M tokens/month and the wrapper premium is &lt; engineering time saved.</li>
+        <li>Need honest token-counting in the response for billing reconciliation across agents.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Choose OpenAI direct when</h2>
+      <ul>
+        <li>High and stable volume — 1B+ tokens/month makes the per-token delta material.</li>
+        <li>You already have an OpenAI account with negotiated enterprise rates.</li>
+        <li>You need OpenAI's other embedding models (text-embedding-3-large at 3072d, ada-002) and want a single provider for all of them.</li>
+        <li>You want dashboard analytics, fine-grained rate-limit visibility, and a support contract.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Try EmbedPay</h2>
+      <p>
+        Install once: <code>npx @melis-ai/x402-tools-mcp</code>. Then call the <code>embedpay</code>
+        tool from your agent. See the <a href="/services/embedpay">EmbedPay service page</a>
+        for the full schema and the <a href="/pipelines/rag">canonical RAG pipeline</a> for
+        a worked composition example.
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .doc-page { padding-top: 4rem; padding-bottom: 5rem; max-width: 880px; }
+    .doc-header { margin-bottom: 3rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .doc-sub { color: var(--text-2); font-size: 1rem; line-height: 1.7; max-width: 720px; }
+    section { margin-bottom: 2.5rem; }
+    section h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+    section p, section li { color: var(--text-2); line-height: 1.7; font-size: 15px; }
+    section ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .note { font-size: 13px; color: var(--text-3); margin-top: 0.75rem; }
+    .compare-table-wrap { overflow-x: auto; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .compare-table th, .compare-table td {
+      text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border-light);
+      color: var(--text-2); vertical-align: top;
+    }
+    .compare-table th {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-3); border-bottom: 1px solid var(--border);
+    }
+    .compare-table tr:hover td { background: var(--surface); }
+  </style>
+</Layout>

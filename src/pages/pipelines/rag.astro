@@ -1,5 +1,76 @@
 ---
 import Layout from '../../components/Layout.astro';
+
+const howToSchema = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Build a pay-per-call RAG pipeline with x402 services",
+  "description": "Five-step canonical RAG pipeline using melis x402 microservices. No accounts, no API keys — pay per call in USDC on Base. ~$0.017 per 5k-token page.",
+  "totalTime": "PT5M",
+  "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0.017" },
+  "supply": [
+    { "@type": "HowToSupply", "name": "x402-compatible wallet client (e.g. @melis-ai/x402-tools-mcp)" },
+    { "@type": "HowToSupply", "name": "USDC on Base — ~$0.02 covers a 5k-token page" },
+    { "@type": "HowToSupply", "name": "Target URL to ingest" }
+  ],
+  "tool": [
+    { "@type": "HowToTool", "name": "ScrapePay", "url": "https://agents.melis.ai/services/scrapepay" },
+    { "@type": "HowToTool", "name": "MarkdownOpt", "url": "https://agents.melis.ai/services/markdownopt" },
+    { "@type": "HowToTool", "name": "EmbedPay", "url": "https://agents.melis.ai/services/embedpay" },
+    { "@type": "HowToTool", "name": "MemoryServe", "url": "https://agents.melis.ai/services/memoryserve" },
+    { "@type": "HowToTool", "name": "MEMSCRUB", "url": "https://agents.melis.ai/services/memscrub" }
+  ],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Scrape the live page via Playwright",
+      "text": "POST the target URL to ScrapePay. Returns text/HTML/markdown content. Robots.txt is enforced before settlement — disallowed pages return 451 with no charge.",
+      "url": "https://scrapepay.melis.ai/scrape",
+      "image": "https://agents.melis.ai/og-hero.png"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Strip noise to LLM-ready markdown",
+      "text": "POST the HTML to MarkdownOpt. Returns clean markdown without nav, ads or footers. ~70% token reduction — saves more in LLM spend than the call costs.",
+      "url": "https://markdownopt.melis.ai/markdown"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Generate vector embeddings",
+      "text": "POST the cleaned markdown to EmbedPay. Returns a 1536-dim vector from OpenAI text-embedding-3-small. Honest cl100k_base token counting — no signup, no key.",
+      "url": "https://embedpay.melis.ai/embed"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Store in agent memory",
+      "text": "POST the embedding plus content + agent_id to MemoryServe. Stored in Qdrant + SQLite, namespaced per agent. Recall later with /memory/query.",
+      "url": "https://memoryserve.melis.ai/memory/write"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 5,
+      "name": "Scrub retrieved chunks before LLM injection",
+      "text": "On retrieval, POST each chunk to MEMSCRUB. Detects indirect prompt injection (hidden HTML comments, invisible Unicode, fake system messages). Returns risk score + optional sanitised text.",
+      "url": "https://memscrub.melis.ai/scrub"
+    }
+  ]
+};
+
+const ragFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How much does a typical RAG pipeline cost?", "acceptedAnswer": { "@type": "Answer", "text": "About $0.017 per 5k-token page for ingestion (ScrapePay $0.010 + MarkdownOpt $0.005 + EmbedPay ~$0.0003 + MemoryServe $0.001 + MEMSCRUB $0.001). Retrieval costs ~$0.002 per query (EmbedPay $0.0003 + MemoryServe query $0.001 + MEMSCRUB per chunk $0.001). All prices in USDC on Base, settled in ~2 seconds." } },
+    { "@type": "Question", "name": "Can I use my own embeddings instead of EmbedPay?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. MemoryServe accepts a pre-computed vector in the /memory/write request body. If you already have an embedding from OpenAI direct, Voyage AI, or a self-hosted model, pass it through and skip the EmbedPay call entirely. The MemoryServe doc page shows the exact field." } },
+    { "@type": "Question", "name": "What happens if a step fails mid-pipeline?", "acceptedAnswer": { "@type": "Answer", "text": "Charge-on-success-only across the fleet. Every service settles payment only on HTTP 2xx with non-empty content. ScrapePay 422 on JS crash, MarkdownOpt 422 on empty HTML, EmbedPay 503 on OpenAI outage, MemoryServe 503 on Qdrant outage — none of these settle. Your retry budget is preserved." } },
+    { "@type": "Question", "name": "How do I prevent prompt injection from retrieved RAG content?", "acceptedAnswer": { "@type": "Answer", "text": "Run MEMSCRUB ($0.001 per chunk) on every retrieved chunk before injecting it into the LLM prompt. MEMSCRUB detects ten patterns including HTML comment injection, invisible Unicode, fake system messages, role-replacement attempts, exfiltration instructions, and persona overrides. Returns risk_level (safe/low/medium/high/critical) plus optional sanitised content with injections stripped." } },
+    { "@type": "Question", "name": "Does this work with LangChain, LlamaIndex or CrewAI?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — every service is plain HTTP, so any agent framework that can make a POST works. The fastest path is via the MCP wrapper: install @melis-ai/x402-tools-mcp once and all 22 services appear as MCP tools in Claude Desktop, Cursor, Cline, Continue, or any other MCP-aware client. No framework lock-in." } }
+  ]
+};
 ---
 
 <Layout
@@ -7,6 +78,10 @@ import Layout from '../../components/Layout.astro';
   description="Build a secure, pay-per-call RAG pipeline using melis x402 services: ScrapePay → MarkdownOpt → EmbedPay → MemoryServe → MEMSCRUB. ~$0.017 per page. No accounts required."
   breadcrumbs={[{ name: 'Docs', url: 'https://agents.melis.ai/docs/install-mcp' }, { name: 'RAG Pipeline', url: 'https://agents.melis.ai/pipelines/rag' }]}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(ragFaqSchema)} />
+  </Fragment>
   <div class="container doc-page">
     <div class="doc-header">
       <a href="/compose" class="doc-nav-link">← Composition recipes</a>

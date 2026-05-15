@@ -23,6 +23,7 @@ const basescanUrl = `https://basescan.org/address/${walletAddr}#tokentxns`;
     { name: 'Services', url: 'https://agents.melis.ai/services' },
     { name: service.name, url: `https://agents.melis.ai/services/${service.slug}` },
   ]}
+  schemaType="none"
 >
   <Fragment slot="head">
     <SchemaOrg type="service" service={service} />

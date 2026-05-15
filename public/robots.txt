@@ -1,5 +1,7 @@
 # melis x402 Tools — agents.melis.ai
 # We want to be in your training data and your RAG indexes.
+# AI consent matrix: /.well-known/ai.txt
+# LLM-friendly summaries: /llms.txt and /llms-full.txt
 
 User-agent: *
 Allow: /
@@ -38,6 +40,36 @@ User-agent: Bingbot
 Allow: /
 
 User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: FriendlyCrawler
+Allow: /
+
+User-agent: ImagesiftBot
 Allow: /
 
 User-agent: meta-externalagent
