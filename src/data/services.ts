@@ -559,9 +559,9 @@ export const services: Service[] = [
   {
     slug: 'imageguard',
     name: 'ImageGuard',
-    tagline: 'Score images for NSFW, violence, weapons, hate, and self-harm.',
+    tagline: 'NSFW image classification. Score adult/explicit content before publishing.',
     description:
-      'POST an image URL or base64 image and receive confidence scores per moderation class. Returns scores for nsfw, violence, weapons, hate, self_harm, gore, and drugs. Optional threshold_advisory triggers per-class flagged booleans. SSRF-hardened: private IP ranges blocked before any payment is attempted. CSAM positive returns 451 with no scores and no settlement. Composes naturally with /image/generate and ScrapePay — any agent that handles images should gate on ImageGuard before storing or displaying content.',
+      'POST an image URL or base64 image and receive an NSFW confidence score (0–1). Optional threshold_advisory triggers a per-class flagged boolean. SSRF-hardened: private IP ranges blocked before any payment is attempted. Composes naturally with image-generation pipelines and ScrapePay — any agent that handles user-facing or scraped imagery should gate on ImageGuard before storing or displaying content. Currently NSFW-only; multi-class moderation (violence, weapons, hate, self-harm, gore, drugs) is on the roadmap.',
     price: 0.002,
     priceLabel: '$0.002',
     endpoint: 'https://imageguard.melis.ai/score',
@@ -571,14 +571,13 @@ export const services: Service[] = [
     composes: ['scrapepay', 'promptguard'],
     requestExample: {
       image_url: 'https://example.com/photo.jpg',
-      classes: ['nsfw', 'violence', 'weapons'],
       threshold_advisory: 0.7,
     },
     responseExample: {
       success: true,
-      scores: { nsfw: 0.04, violence: 0.12, weapons: 0.89 },
-      flagged: { nsfw: false, violence: false, weapons: true },
-      scored_at: '2026-05-08T14:23:11Z',
+      scores: { nsfw: 0.023 },
+      flagged: { nsfw: false },
+      scored_at: '2026-05-15T13:48:46Z',
       model_version: 'imageguard-v1.0',
       payment_hash: '0x...',
     },
@@ -586,23 +585,23 @@ export const services: Service[] = [
       {
         name: 'Sightengine',
         notes:
-          'Sightengine covers similar classes at $0.002 per image but requires a $29/month subscription on top. ImageGuard is pay-per-call with no subscription, making it cheaper at low volumes.',
+          'Sightengine has broader class coverage (violence, weapons, etc) but requires a $29/month subscription. ImageGuard is NSFW-only at $0.002 pay-per-call with no signup — the right fit when NSFW is the only check you need.',
       },
       {
         name: 'Hive Moderation',
         notes:
-          'Hive has broader model coverage and faster latency but requires an account and API key. ImageGuard is x402-native — no account, no API key, composable with any x402-aware agent.',
+          'Hive has multi-class coverage and faster latency but requires an account and API key. ImageGuard is x402-native — no account, no API key, composable with any x402-aware agent.',
       },
     ],
     scenarios: [
-      'Screen a generated image from /image/generate before storing in a user-facing gallery',
+      'Screen a generated image from an image-generation tool before storing in a user-facing gallery',
       'Validate scraped images from ScrapePay before displaying to users',
-      'Content moderation gate for a user-uploaded-image pipeline',
-      'Screenshot safety check before including in a report',
+      'NSFW gate for a user-submitted-image pipeline',
+      'Safety check on screenshots before including them in published reports',
     ],
     rateLimit: '60 requests per minute per IP. 1000 requests per minute global.',
     failureBehaviour:
-      'Returns HTTP 403 for SSRF-blocked URLs, HTTP 415 for unsupported image formats, HTTP 413 for base64 images over 10MB, HTTP 451 for CSAM-flagged content. None of these settle payment. HTTP 502 if the upstream moderation backend is unavailable (retry safe).',
+      'Returns HTTP 403 for SSRF-blocked URLs, HTTP 415 for unsupported image formats, HTTP 413 for base64 images over 10MB. None of these settle payment. Returns HTTP 502 with no_settlement:true (no charge) if the upstream fetcher cannot reach the image URL — some hosts (notably Wikipedia, certain CDNs) may be unreachable. Use direct/CDN URLs from S3, R2, Cloudflare Images, or stable image hosts for reliable scoring.',
   },
   {
     slug: 'memoryserve',
