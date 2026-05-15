@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import SchemaOrg from './SchemaOrg.astro';
 
 interface Props {
   title: string;
@@ -7,6 +8,8 @@ interface Props {
   canonical?: string;
   ogImage?: string;
   breadcrumbs?: { name: string; url: string }[];
+  /** Defaults to 'page'. Set to 'landing' on the homepage. Service pages render SchemaOrg themselves with type='service'. */
+  schemaType?: 'landing' | 'page' | 'none';
 }
 
 const {
@@ -15,6 +18,7 @@ const {
   canonical = Astro.url.href,
   ogImage = 'https://agents.melis.ai/og-hero.png',
   breadcrumbs,
+  schemaType = 'page',
 } = Astro.props;
 
 const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0 ? {
@@ -71,9 +75,12 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="text/plain" title="LLM-readable site summary" href="/llms.txt" />
+    <link rel="alternate" type="text/plain" title="LLM-readable full content" href="/llms-full.txt" />
     {breadcrumbSchema && (
       <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
     )}
+    {schemaType !== 'none' && <SchemaOrg type={schemaType} />}
     <slot name="head" />
   </head>
   <body>
@@ -121,7 +128,7 @@ const fullTitle = title.includes('melis') ? title : `${title} — melis x402 Too
               <li><a href="/services/scrapepay">ScrapePay</a></li>
               <li><a href="/services/markdownopt">MarkdownOpt</a></li>
               <li><a href="/services/promptguard">PromptGuard</a></li>
-              <li><a href="/services">All 16 →</a></li>
+              <li><a href="/services">All 22 →</a></li>
             </ul>
           </div>
 

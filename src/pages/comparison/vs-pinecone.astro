@@ -1,0 +1,100 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="MemoryServe vs Pinecone — Agent memory store comparison"
+  description="Honest comparison: MemoryServe (x402, no signup, $0.001/op, Qdrant-backed) vs Pinecone (enterprise vector DB, account + dashboard, higher scale ceiling). When each one wins."
+  breadcrumbs={[{ name: 'Comparison', url: 'https://agents.melis.ai/comparison/vs-pinecone' }, { name: 'vs Pinecone', url: 'https://agents.melis.ai/comparison/vs-pinecone' }]}
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <h1>MemoryServe vs Pinecone</h1>
+      <p class="doc-sub">
+        Both store and recall vectors for agent memory and RAG. MemoryServe is x402-native
+        pay-per-call with no signup. Pinecone is a managed enterprise vector database.
+        Use this page to pick — honest tradeoffs, not marketing.
+      </p>
+    </div>
+
+    <section>
+      <h2>At a glance</h2>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th><a href="/services/memoryserve">MemoryServe</a></th>
+              <th>Pinecone</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Signup required</td><td>No</td><td>Yes — account + project + index provisioning</td></tr>
+            <tr><td>Pricing model</td><td>$0.001 USDC per write or query</td><td>Starter free (limited) → $50–$500+/mo per index</td></tr>
+            <tr><td>Underlying engine</td><td>Qdrant (vectors) + SQLite (full content + metadata)</td><td>Proprietary distributed vector DB</td></tr>
+            <tr><td>Per-agent isolation</td><td>Built-in: <code>agent_id</code> namespace per call</td><td>Manual: separate index or namespace per tenant</td></tr>
+            <tr><td>Scale ceiling</td><td>Suitable up to ~10M vectors per agent_id; not enterprise-scale</td><td>Billions of vectors with sharding</td></tr>
+            <tr><td>Hybrid search</td><td>Vector only (cosine similarity)</td><td>Hybrid: dense + sparse + metadata filter</td></tr>
+            <tr><td>Embedding generation</td><td>Auto via EmbedPay (skippable if you bring your own vector)</td><td>BYO — Pinecone doesn't embed; you call OpenAI/Voyage separately</td></tr>
+            <tr><td>MCP integration</td><td>Native via <code>@melis-ai/x402-tools-mcp</code></td><td>Via community wrappers</td></tr>
+            <tr><td>Dashboard / analytics</td><td>None (use Basescan for billing transparency)</td><td>Polished — index size, query latency, cost</td></tr>
+            <tr><td>GDPR delete</td><td>Free: <code>DELETE /memory/agent/{`{`}id{`}`}</code> wipes all memories for an agent</td><td>Standard index/namespace delete API</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Choose MemoryServe when</h2>
+      <ul>
+        <li>You're building a multi-tenant agent runtime — per-call billing with built-in agent_id isolation is cleaner than per-tenant Pinecone indices.</li>
+        <li>You need the canonical RAG pipeline composability (ScrapePay → MarkdownOpt → EmbedPay → MemoryServe → MEMSCRUB on the same x402 wallet).</li>
+        <li>Volume is moderate (under ~10M vectors per agent_id) and you don't want to provision and pay for an index that mostly idles.</li>
+        <li>GDPR right-to-delete matters and you want a free deletion endpoint, not a metered one.</li>
+        <li>You don't want to manage an additional account / API key in your stack.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Choose Pinecone when</h2>
+      <ul>
+        <li>Scale: hundreds of millions to billions of vectors with sub-100ms queries at p99.</li>
+        <li>Hybrid search: you need sparse + dense fusion or rich metadata filtering at query time.</li>
+        <li>Enterprise procurement: SOC2 contract, dedicated support, SLA — these are Pinecone product features.</li>
+        <li>You're already on Pinecone and a swap isn't worth the migration time.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Try MemoryServe</h2>
+      <p>
+        Install once: <code>npx @melis-ai/x402-tools-mcp</code>. Then call <code>memoryserve_memory_write</code>
+        and <code>memoryserve_memory_query</code> from your agent. See the
+        <a href="/services/memoryserve">MemoryServe page</a> for the full schema and the
+        <a href="/pipelines/rag">RAG pipeline</a> for a worked example.
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .doc-page { padding-top: 4rem; padding-bottom: 5rem; max-width: 880px; }
+    .doc-header { margin-bottom: 3rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .doc-sub { color: var(--text-2); font-size: 1rem; line-height: 1.7; max-width: 720px; }
+    section { margin-bottom: 2.5rem; }
+    section h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+    section p, section li { color: var(--text-2); line-height: 1.7; font-size: 15px; }
+    section ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .compare-table-wrap { overflow-x: auto; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .compare-table th, .compare-table td {
+      text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border-light);
+      color: var(--text-2); vertical-align: top;
+    }
+    .compare-table th {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-3); border-bottom: 1px solid var(--border);
+    }
+    .compare-table tr:hover td { background: var(--surface); }
+  </style>
+</Layout>

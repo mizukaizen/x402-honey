@@ -4,70 +4,92 @@ import { WALLETS } from '../data/services';
 
 interface Props {
   service?: Service;
-  type?: 'landing' | 'service';
+  type?: 'landing' | 'service' | 'page';
 }
 
 const { service, type = 'landing' } = Astro.props;
+
+// Organization JSON-LD — emitted on every variant for sitewide entity graph
+const orgSchema = {
+  "@type": "Organization",
+  "name": "Melis AI",
+  "url": "https://melis.ai",
+  "logo": "https://agents.melis.ai/favicon.svg",
+  "sameAs": [
+    "https://agents.melis.ai",
+    "https://www.npmjs.com/package/@melis-ai/x402-tools-mcp",
+    "https://github.com/mizukaizen",
+    "https://twitter.com/melisarchimedes"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "sean@melis.ai",
+    "contactType": "customer support"
+  }
+};
+
+const websiteSchema = {
+  "@type": "WebSite",
+  "url": "https://agents.melis.ai",
+  "name": "melis x402 Tools",
+  "description": "22 pay-per-call x402 utility APIs for AI agents. No accounts, no API keys. Pay in USDC on Base.",
+  "publisher": { "@type": "Organization", "name": "Melis AI" },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://agents.melis.ai/services?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
 ---
 
 {type === 'landing' && (
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "name": "Melis AI",
-        "url": "https://melis.ai",
-        "sameAs": [
-          "https://agents.melis.ai",
-          "https://www.npmjs.com/package/@melis-ai/x402-tools-mcp"
-        ],
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "email": "sean@melis.ai",
-          "contactType": "customer support"
-        }
-      },
-      {
-        "@type": "WebSite",
-        "url": "https://agents.melis.ai",
-        "name": "melis x402 Tools",
-        "description": "22 pay-per-call x402 utility APIs for AI agents. No accounts, no API keys. Pay in USDC on Base.",
-        "publisher": {
-          "@type": "Organization",
-          "name": "Melis AI"
-        }
-      }
-    ]
+    "@graph": [orgSchema, websiteSchema]
+  })} />
+)}
+
+{type === 'page' && (
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [orgSchema, websiteSchema]
   })} />
 )}
 
 {type === 'service' && service && (
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": service.name,
-    "applicationCategory": "DeveloperApplication",
-    "applicationSubCategory": "API",
-    "operatingSystem": "any",
-    "description": service.description,
-    "offers": {
-      "@type": "Offer",
-      "price": service.price.toFixed(3),
-      "priceCurrency": "USDC",
-      "priceSpecification": {
-        "@type": "UnitPriceSpecification",
-        "price": service.price.toFixed(3),
-        "priceCurrency": "USDC",
-        "unitText": "per call"
+    "@graph": [
+      orgSchema,
+      {
+        "@type": "SoftwareApplication",
+        "name": service.name,
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "API",
+        "operatingSystem": "any",
+        "description": service.description,
+        "offers": {
+          "@type": "Offer",
+          "price": service.price.toFixed(5),
+          "priceCurrency": "USDC",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": service.price.toFixed(5),
+            "priceCurrency": "USDC",
+            "unitText": "per call"
+          }
+        },
+        "provider": {
+          "@type": "Organization",
+          "name": "Melis AI",
+          "url": "https://melis.ai"
+        },
+        "url": `https://agents.melis.ai/services/${service.slug}`,
+        "sameAs": service.endpoint
       }
-    },
-    "provider": {
-      "@type": "Organization",
-      "name": "Melis AI",
-      "url": "https://melis.ai"
-    },
-    "url": `https://agents.melis.ai/services/${service.slug}`,
-    "sameAs": service.endpoint
+    ]
   })} />
 )}

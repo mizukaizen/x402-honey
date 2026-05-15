@@ -1,0 +1,118 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout
+  title="Content Moderation Pipeline — Pay-per-call moderation for AI agents"
+  description="Compose a multi-layer content moderation pipeline with melis x402 services: ImageGuard (NSFW image scoring) + MEMSCRUB (RAG content injection) + PromptGuard (user input). No subscriptions."
+  breadcrumbs={[{ name: 'Use cases', url: 'https://agents.melis.ai/use-cases/content-moderation' }, { name: 'Content moderation', url: 'https://agents.melis.ai/use-cases/content-moderation' }]}
+>
+  <div class="container doc-page">
+    <div class="doc-header">
+      <h1>Use case: content moderation</h1>
+      <p class="doc-sub">
+        Multi-layer moderation for agent runtimes: user input, retrieved RAG content,
+        and generated images all gate-checked before they cross into your LLM or your users.
+      </p>
+    </div>
+
+    <section>
+      <h2>The three layers</h2>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr><th>Surface</th><th>Service</th><th>Cost</th><th>Catches</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>User input to LLM</td>
+              <td><a href="/services/promptguard">PromptGuard</a></td>
+              <td>$0.002</td>
+              <td>Jailbreaks, role overrides, system-prompt extraction</td>
+            </tr>
+            <tr>
+              <td>Retrieved RAG content</td>
+              <td><a href="/services/memscrub">MEMSCRUB</a></td>
+              <td>$0.001 per chunk</td>
+              <td>Hidden HTML comments, invisible Unicode, fake system messages, exfiltration instructions</td>
+            </tr>
+            <tr>
+              <td>Generated / uploaded image</td>
+              <td><a href="/services/imageguard">ImageGuard</a></td>
+              <td>$0.002 per image</td>
+              <td>NSFW / adult / explicit content (multi-class moderation on roadmap)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>The flow</h2>
+      <pre><code>{`# Inbound user message
+user_msg = ...
+POST promptguard.melis.ai/score  {"prompt": user_msg, "sensitivity": "medium"}
+  → if risk_level in {"high","critical"}: reject
+
+# Generated / scraped image
+image_url = ...
+POST imageguard.melis.ai/score  {"image_url": image_url, "threshold_advisory": 0.7}
+  → if scores.nsfw > 0.7: gate
+
+# RAG chunks before LLM context assembly
+for chunk in retrieved_chunks:
+  POST memscrub.melis.ai/scrub  {"content": chunk, "sanitize": true}
+    → if risk_level in {"medium","high","critical"}: drop or use sanitized version`}</code></pre>
+    </section>
+
+    <section>
+      <h2>Why compose vs single-vendor</h2>
+      <ul>
+        <li>Each layer charges only on success — failed moderation never costs you (4xx is no_settlement).</li>
+        <li>Different upstream models per layer — no single vendor's coverage gap takes you down.</li>
+        <li>Per-call billing means you pay for exactly what you screen. No idle subscription.</li>
+        <li>x402 protocol means new moderation providers can plug in without re-architecting.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Honest limitations</h2>
+      <ul>
+        <li>ImageGuard currently returns NSFW only — multi-class (violence, weapons, hate) is on the roadmap. <a href="/services/imageguard">Details on the service page</a>.</li>
+        <li>MEMSCRUB is heuristics-only in v1 — no ML model behind it. Trades off recall for latency and cost.</li>
+        <li>PromptGuard is regex + pattern-matching. Excellent for known attacks; less effective for novel ones.</li>
+        <li>For high-stakes regulated moderation (CSAM, terrorism, election content) layer in a specialist provider on top of melis.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Related</h2>
+      <p>
+        <a href="/services/promptguard">PromptGuard</a> · <a href="/services/memscrub">MEMSCRUB</a> ·
+        <a href="/services/imageguard">ImageGuard</a> · <a href="/compose">All composition recipes</a>
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .doc-page { padding-top: 4rem; padding-bottom: 5rem; max-width: 880px; }
+    .doc-header { margin-bottom: 3rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .doc-sub { color: var(--text-2); font-size: 1rem; line-height: 1.7; max-width: 720px; }
+    section { margin-bottom: 2.25rem; }
+    section h2 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+    section p, section li { color: var(--text-2); line-height: 1.7; font-size: 15px; }
+    section ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    pre { font-size: 13px; }
+    .compare-table-wrap { overflow-x: auto; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .compare-table th, .compare-table td {
+      text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border-light);
+      color: var(--text-2); vertical-align: top;
+    }
+    .compare-table th {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-3); border-bottom: 1px solid var(--border);
+    }
+  </style>
+</Layout>

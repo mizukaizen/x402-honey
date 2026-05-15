@@ -1,0 +1,70 @@
+---
+import Layout from '../components/Layout.astro';
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How does an AI agent discover melis x402 services?", "acceptedAnswer": { "@type": "Answer", "text": "Five discovery surfaces. (1) /llms.txt — concise catalogue with prices. (2) /llms-full.txt — full schemas plus composition recipes. (3) /openapi.json — OpenAPI 3.1 spec for all 22 endpoints. (4) /.well-known/ai-plugin.json — ChatGPT-style plugin manifest. (5) Each service exposes a /.well-known/mcp.json under its own subdomain for MCP-style discovery. The single command npx @melis-ai/x402-tools-mcp wires all of these into any MCP-aware agent runtime." } },
+    { "@type": "Question", "name": "How does an agent pay without holding a credit card?", "acceptedAnswer": { "@type": "Answer", "text": "The agent holds a Base wallet with a USDC balance. When a service returns HTTP 402, the wallet client signs an EIP-3009 transferAuth header for the exact amount and retries the request. The service verifies the payment header, settles within ~2 seconds on Base, and returns the result. No credit card, no account, no API key — the wallet address is the identity. The MCP wrapper handles all of this transparently; from agent code it looks like a normal tool call." } },
+    { "@type": "Question", "name": "How does an agent know what it's spending in total?", "acceptedAnswer": { "@type": "Answer", "text": "Every response includes a payment_hash field linking to the on-chain settlement. Aggregate spend is verifiable by listing transfers from the wallet on Basescan. For programmatic budget enforcement, wrap your agent's calls with Loopwall ($0.001 issue + $0.0005 per hop) — it mints a signed Job Envelope at chain start with origin, max_hops, and budget cap; every subsequent call validates against the remaining budget." } },
+    { "@type": "Question", "name": "Can an agent operating across multiple users share one wallet?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Wallets in x402 are not tied to specific users — the agent itself holds the wallet and bills its users out-of-band. Use the wallet-rate-limiter pattern (per-payer-address quotas) inside your agent to prevent any one user from draining the budget. Loopwall provides this for free as part of its hop validation." } },
+    { "@type": "Question", "name": "How do MCP tools map to x402 service calls?", "acceptedAnswer": { "@type": "Answer", "text": "@melis-ai/x402-tools-mcp registers each of the 22 services as a separate MCP tool. The tool name is the service slug with hyphens replaced by underscores (scrapepay → scrapepay; docconvert_text → docconvert_text). Tool input schemas match the service's POST body. The wrapper handles the 402 → sign → retry loop internally; from MCP's perspective every call is a synchronous tool invocation that returns the service's 2xx response payload." } },
+    { "@type": "Question", "name": "What happens if my agent calls a service with a malformed body?", "acceptedAnswer": { "@type": "Answer", "text": "Standard HTTP semantics. The service returns 4xx with a JSON error body and the no_settlement flag set — the x402 SDK settles payment only on 2xx responses, so a malformed call costs nothing. Your retry budget is preserved. For services with upstream dependencies (EmbedPay → OpenAI, ImageGuard → api4.ai) upstream failures return 502 or 503 with no_settlement; safe to retry." } },
+    { "@type": "Question", "name": "How does my agent prevent prompt injection from retrieved content?", "acceptedAnswer": { "@type": "Answer", "text": "MEMSCRUB. $0.001 per chunk. Scans retrieved RAG content for 10 indirect-injection patterns: hidden HTML comments, invisible Unicode, fake system messages, role-replacement attempts, exfiltration instructions, persona overrides, and more. Returns a risk score (0-100), risk_level (safe to critical), and an optional sanitised version. Pair with PromptGuard ($0.002) which screens direct user input before it reaches the LLM." } },
+    { "@type": "Question", "name": "Are service prices stable?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Prices are pinned in the source repository and announced in release notes. Never raised retroactively for in-flight calls — the 402 challenge always quotes the exact amount before payment. Deprecations and shutdowns get 90 days' notice via the (currently empty) /deprecations page." } },
+    { "@type": "Question", "name": "Can my agent compose multiple melis services in one call?", "acceptedAnswer": { "@type": "Answer", "text": "Not natively in a single HTTP request — every service is independent and billed per call. But composition is the design pattern; see /compose for seven canonical workflows (research, notification, document generation, URL verification, RAG pipeline, image moderation gate, agent-to-agent relay). Each step's payment is independent and verifiable on-chain." } },
+    { "@type": "Question", "name": "How do I authorise a third-party agent to spend from my wallet?", "acceptedAnswer": { "@type": "Answer", "text": "Two patterns. (1) Sub-budget: top up the agent's own wallet with a fixed USDC amount; once spent, the agent can't continue without your action. Cleanest, most aligned with x402's micropayment philosophy. (2) Signed Job Envelope via Loopwall: issue an envelope with budget_usd and max_hops, hand the envelope to the agent. The agent presents the envelope at each call; the loopwall service tracks cumulative spend cryptographically. Suits short-lived delegated tasks." } }
+  ]
+};
+---
+
+<Layout
+  title="FAQ for AI Agents — How agents discover, pay for, and use melis x402 services"
+  description="Agent-builder FAQ for melis x402 Tools. Discovery surfaces, x402 payment flow, MCP integration, budget enforcement, composition patterns, prompt injection defence. Built for agent runtimes, not humans."
+  breadcrumbs={[{ name: 'Agents FAQ', url: 'https://agents.melis.ai/agents-faq' }]}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
+
+  <div class="container doc-page">
+    <div class="doc-header">
+      <h1>FAQ for AI agents</h1>
+      <p class="doc-sub">
+        Built for agent runtimes, not humans. If you're building an agent that uses or
+        might use melis x402 services, these are the questions other agent builders
+        ask. For the general human-facing FAQ see <a href="/faq">/faq</a>.
+      </p>
+    </div>
+
+    {faqSchema.mainEntity.map((item) => (
+      <section>
+        <h2>{item.name}</h2>
+        <p>{item.acceptedAnswer.text}</p>
+      </section>
+    ))}
+
+    <section class="cta">
+      <h2>Ready to start?</h2>
+      <p>
+        <a href="/docs/getting-started">5-minute getting started</a> ·
+        <a href="/pipelines/rag">Canonical RAG pipeline</a> ·
+        <a href="/compose">Composition recipes</a> ·
+        <a href="/services">All 22 services</a>
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .doc-page { padding-top: 4rem; padding-bottom: 5rem; max-width: 800px; }
+    .doc-header { margin-bottom: 3rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .doc-sub { color: var(--text-2); font-size: 1rem; line-height: 1.7; max-width: 720px; }
+    section { margin-bottom: 2.25rem; }
+    section h2 { font-size: 1.15rem; margin-bottom: 0.75rem; line-height: 1.4; }
+    section p { color: var(--text-2); line-height: 1.7; font-size: 15px; }
+    .cta { margin-top: 4rem; }
+    .cta p a { margin-right: 0.5rem; }
+  </style>
+</Layout>
