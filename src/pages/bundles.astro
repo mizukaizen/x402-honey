@@ -1,0 +1,81 @@
+---
+import Layout from '../components/Layout.astro';
+import { services } from '../data/services';
+
+const bundles = services.filter((s) => s.isBundle);
+---
+
+<Layout
+  title="Bundles — multi-source workflow products for AI agents"
+  description="melis bundles fan out across 8-12 sources in parallel, triage by cross-source corroboration, and render a professional brief that clears a 10-signal quality gate. Pay-per-brief, USDC on Base, verifiable provenance."
+  breadcrumbs={[{ name: 'Bundles', url: 'https://agents.melis.ai/bundles' }]}
+>
+  <div class="container" style="padding-top:4rem;padding-bottom:4rem;">
+    <h1>Bundles</h1>
+    <p class="subtitle">
+      Atomic services do one thing. <strong>Bundles do the workflow.</strong> Each one fans out
+      across 8–12 sources in parallel, triages by cross-source corroboration, and renders a
+      brief that passes a 10-signal professionalism gate — the editorial layer, not just a scrape.
+      Charge-on-success-only. Immutable shareable snapshots. Verifiable on-chain provenance.
+    </p>
+
+    {bundles.map((b) => (
+      <a class="bundle-card" href={`/services/${b.slug}`}>
+        <div class="bundle-head">
+          <h2>{b.name}</h2>
+          <span class="bundle-price">{b.priceDisplay ?? b.priceLabel} USDC</span>
+        </div>
+        <p class="bundle-tagline">{b.tagline}</p>
+        <div class="bundle-stats">
+          <span class="stat"><strong>{b.sourcesUsed}</strong> sources</span>
+          <span class="stat"><strong>10</strong>-signal quality gate</span>
+          <span class="stat">charge-on-success</span>
+          {b.cacheable && <span class="stat">cached · instant re-reads</span>}
+          <span class="stat">EAS provenance</span>
+        </div>
+        <div class="bundle-actions">
+          <span class="bundle-link">Details →</span>
+          {b.exampleSnapshotUrl && (
+            <a class="bundle-example" href={b.exampleSnapshotUrl} target="_blank" rel="noopener">
+              View example brief ↗
+            </a>
+          )}
+        </div>
+      </a>
+    ))}
+
+    {bundles.length === 0 && <p class="subtitle">No bundles published yet.</p>}
+
+    <div class="bundle-how">
+      <h3>How a bundle differs from a service</h3>
+      <ul>
+        <li><strong>Fan-out:</strong> 8–12 sources hit in parallel (Promise.allSettled — one source failing never blocks the brief).</li>
+        <li><strong>Triage:</strong> cross-source corroboration scoring — a story confirmed in 4 sources outranks a high-engagement single-source post.</li>
+        <li><strong>Senior Partner gate:</strong> a critic pass enforces 10 professionalism signals (source diversity, by-the-numbers panel, provenance ribbon, why-it-matters, contrarian voice, named-author citations…). Under 8/10 → 502, no charge.</li>
+        <li><strong>Snapshot + receipt:</strong> every brief gets an immutable <code>/brief/&lt;slug&gt;/snap_&lt;id&gt;</code> URL; your payment hash is a 30-day free re-fetch token.</li>
+        <li><strong>Provenance:</strong> content + sources hashed and (once the wallet is funded) attested on Base via EAS.</li>
+      </ul>
+    </div>
+  </div>
+
+  <style>
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--text-2); max-width: 680px; line-height: 1.7; margin-bottom: 2.5rem; }
+    .bundle-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; transition: border-color .15s; }
+    .bundle-card:hover { border-color: var(--accent); text-decoration: none; }
+    .bundle-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+    .bundle-head h2 { font-size: 1.25rem; margin: 0; }
+    .bundle-price { font-family: var(--font-mono); font-size: 13px; color: var(--accent); white-space: nowrap; }
+    .bundle-tagline { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0.5rem 0 1rem; }
+    .bundle-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+    .stat { font-family: var(--font-mono); font-size: 11px; letter-spacing: .03em; padding: 3px 9px; border: 1px solid var(--border-strong); border-radius: 4px; color: var(--text-3); }
+    .stat strong { color: var(--text); }
+    .bundle-actions { display: flex; gap: 1.25rem; align-items: center; }
+    .bundle-link { font-size: 13px; color: var(--accent); font-weight: 500; }
+    .bundle-example { font-size: 13px; color: var(--link); }
+    .bundle-how { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+    .bundle-how h3 { font-size: 1.1rem; margin-bottom: 1rem; }
+    .bundle-how ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.6rem; }
+    .bundle-how li { color: var(--text-2); line-height: 1.65; font-size: 14px; }
+  </style>
+</Layout>
