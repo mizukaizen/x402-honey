@@ -13,6 +13,7 @@ export interface Service {
   demoSpace?: string;  // HuggingFace Space URL for a free rate-limited live demo
   isBundle?: boolean;  // workflow bundle (multi-source) vs atomic service
   sourcesUsed?: number;        // bundle: number of upstream sources fanned out
+  bundleSources?: { id: string; name: string; owned: boolean; category: string; note?: string }[]; // bundle: the actual source adapters (owned=melis service)
   cacheable?: boolean;         // bundle: served from cache between regenerations
   exampleSnapshotUrl?: string; // bundle: a free immutable sample brief
   composes: string[];  // slugs of related services
@@ -967,6 +968,18 @@ export const services: Service[] = [
     category: 'bundle',
     isBundle: true,
     sourcesUsed: 10,
+    bundleSources: [
+      { id: 'github', name: 'GitHub', owned: false, category: 'code' },
+      { id: 'reddit', name: 'Reddit', owned: false, category: 'community' },
+      { id: 'hackernews', name: 'Hacker News', owned: false, category: 'community' },
+      { id: 'googlenews', name: 'Google News', owned: false, category: 'press' },
+      { id: 'blog-rss', name: 'Crypto news (3 outlets)', owned: false, category: 'press' },
+      { id: 'defillama', name: 'DefiLlama', owned: false, category: 'on-chain' },
+      { id: 'basescan', name: 'Basescan', owned: false, category: 'on-chain' },
+      { id: 'polymarket', name: 'Polymarket', owned: false, category: 'prediction' },
+      { id: 'arxiv', name: 'arXiv', owned: false, category: 'academic' },
+      { id: 'twitter', name: 'Twitter', owned: false, category: 'social', note: 'graceful-degrade' },
+    ],
     cacheable: true,
     exampleSnapshotUrl: '/brief/x402-daily/snap_2da6d0323929',
     composes: ['scrapepay', 'markdownopt', 'embedpay'],
