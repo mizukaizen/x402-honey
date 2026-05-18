@@ -19,30 +19,55 @@ const bundles = services.filter((s) => s.isBundle);
       Charge-on-success-only. Immutable shareable snapshots. Verifiable on-chain provenance.
     </p>
 
-    {bundles.map((b) => (
-      <a class="bundle-card" href={`/services/${b.slug}`}>
-        <div class="bundle-head">
-          <h2>{b.name}</h2>
-          <span class="bundle-price">{b.priceDisplay ?? b.priceLabel} USDC</span>
-        </div>
-        <p class="bundle-tagline">{b.tagline}</p>
-        <div class="bundle-stats">
-          <span class="stat"><strong>{b.sourcesUsed}</strong> sources</span>
-          <span class="stat"><strong>10</strong>-signal quality gate</span>
-          <span class="stat">charge-on-success</span>
-          {b.cacheable && <span class="stat">cached · instant re-reads</span>}
-          <span class="stat">EAS provenance</span>
-        </div>
-        <div class="bundle-actions">
-          <span class="bundle-link">Details →</span>
-          {b.exampleSnapshotUrl && (
-            <a class="bundle-example" href={b.exampleSnapshotUrl} target="_blank" rel="noopener">
-              View example brief ↗
-            </a>
+    <div class="bundles-grid">
+      {bundles.map((b) => (
+        <div class="bundle-card">
+          <div class="bundle-head">
+            <h2>
+              <a class="card-link" href={`/services/${b.slug}`}>{b.name}</a>
+            </h2>
+            <span class="bundle-price">{b.priceDisplay ?? b.priceLabel} USDC</span>
+          </div>
+          <p class="bundle-tagline">{b.tagline}</p>
+
+          <div class="bundle-stats">
+            <span class="stat"><strong>{b.sourcesUsed}</strong> sources</span>
+            <span class="stat"><strong>10</strong>-signal gate</span>
+            <span class="stat">charge-on-success</span>
+            {b.cacheable && <span class="stat">cached</span>}
+            <span class="stat">EAS provenance</span>
+          </div>
+
+          {b.bundleSources && b.bundleSources.length > 0 && (
+            <div class="bundle-sources">
+              <div class="bundle-sources-head">
+                Sources ({b.bundleSources.length})
+                <span class="legend">
+                  <span class="dot dot-owned"></span> melis service
+                  <span class="dot dot-ext"></span> free public API
+                </span>
+              </div>
+              <div class="chip-row">
+                {b.bundleSources.map((s) => (
+                  <span class={`src-chip ${s.owned ? 'src-owned' : 'src-ext'}`} title={s.note ? `${s.category} · ${s.note}` : s.category}>
+                    {s.name}{s.note ? <em> · {s.note}</em> : null}
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
+
+          <div class="bundle-footer">
+            <a class="footer-primary" href={`/services/${b.slug}`}>Details →</a>
+            {b.exampleSnapshotUrl && (
+              <a class="footer-secondary" href={b.exampleSnapshotUrl} target="_blank" rel="noopener">
+                View example brief ↗
+              </a>
+            )}
+          </div>
         </div>
-      </a>
-    ))}
+      ))}
+    </div>
 
     {bundles.length === 0 && <p class="subtitle">No bundles published yet.</p>}
 
@@ -61,18 +86,71 @@ const bundles = services.filter((s) => s.isBundle);
   <style>
     h1 { font-size: 2rem; margin-bottom: 0.5rem; }
     .subtitle { color: var(--text-2); max-width: 680px; line-height: 1.7; margin-bottom: 2.5rem; }
-    .bundle-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; transition: border-color .15s; }
-    .bundle-card:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Responsive grid — 1 col mobile, 2 col >=768px. A single bundle sits
+       left-aligned in column 1 at ~half width (intentional, not stretched). */
+    .bundles-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (min-width: 768px) {
+      .bundles-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .bundle-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      transition: border-color .15s;
+    }
+    .bundle-card:hover { border-color: var(--accent); }
+
     .bundle-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
     .bundle-head h2 { font-size: 1.25rem; margin: 0; }
+    /* Stretched link — whole card is clickable to the detail page without an
+       invalid nested <a>; the example link below opts back out via z-index. */
+    .card-link { color: var(--text); text-decoration: none; }
+    .card-link::after { content: ""; position: absolute; inset: 0; z-index: 0; }
+    .bundle-card:hover .card-link { color: var(--accent); }
     .bundle-price { font-family: var(--font-mono); font-size: 13px; color: var(--accent); white-space: nowrap; }
     .bundle-tagline { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0.5rem 0 1rem; }
-    .bundle-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+
+    .bundle-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
     .stat { font-family: var(--font-mono); font-size: 11px; letter-spacing: .03em; padding: 3px 9px; border: 1px solid var(--border-strong); border-radius: 4px; color: var(--text-3); }
     .stat strong { color: var(--text); }
-    .bundle-actions { display: flex; gap: 1.25rem; align-items: center; }
-    .bundle-link { font-size: 13px; color: var(--accent); font-weight: 500; }
-    .bundle-example { font-size: 13px; color: var(--link); }
+
+    .bundle-sources { margin-bottom: 1.25rem; }
+    .bundle-sources-head {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--text-3); margin-bottom: 0.6rem; display: flex; justify-content: space-between;
+      align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .legend { display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; font-size: 10px; color: var(--text-3); }
+    .legend .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .legend .dot-owned { background: var(--accent); margin-left: 6px; }
+    .legend .dot-ext { background: var(--text-3); margin-left: 10px; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+    .src-chip {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: .02em;
+      padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border-strong);
+    }
+    .src-chip em { font-style: normal; opacity: 0.6; }
+    .src-owned { color: var(--accent); border-color: rgba(216,164,74,0.4); background: rgba(216,164,74,0.08); }
+    .src-ext   { color: var(--text-3); }
+
+    .bundle-footer {
+      margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .footer-primary { font-size: 13px; color: var(--accent); font-weight: 500; position: relative; z-index: 1; }
+    .footer-secondary { font-size: 12px; color: var(--link); position: relative; z-index: 1; }
+
     .bundle-how { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
     .bundle-how h3 { font-size: 1.1rem; margin-bottom: 1rem; }
     .bundle-how ul { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.6rem; }
