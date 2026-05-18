@@ -8,9 +8,13 @@ export interface Service {
   endpoint: string;
   method: 'POST' | 'GET';
   wallet: 'microservices' | 'molt';
-  category: 'web' | 'safety' | 'notify' | 'convert' | 'validate' | 'ai';
+  category: 'web' | 'safety' | 'notify' | 'convert' | 'validate' | 'ai' | 'bundle';
   priceDisplay?: string; // override for non-per-call pricing display
   demoSpace?: string;  // HuggingFace Space URL for a free rate-limited live demo
+  isBundle?: boolean;  // workflow bundle (multi-source) vs atomic service
+  sourcesUsed?: number;        // bundle: number of upstream sources fanned out
+  cacheable?: boolean;         // bundle: served from cache between regenerations
+  exampleSnapshotUrl?: string; // bundle: a free immutable sample brief
   composes: string[];  // slugs of related services
   requestExample: object;
   responseExample: object;
@@ -947,6 +951,54 @@ export const services: Service[] = [
     rateLimit: 'None published.',
     failureBehaviour:
       '/issue returns HTTP 400 for invalid max_hops or budget_usd. /hop returns HTTP 409 if the envelope has already exceeded its hop limit or budget; HTTP 410 if the envelope signature is invalid or expired. None of these settle payment.',
+  },
+  {
+    slug: 'x402-daily',
+    name: 'Crypto-Tech Daily Brief',
+    tagline: 'Daily x402 + crypto-AI ecosystem brief — 10 sources, professional synthesis, verifiable provenance',
+    description:
+      'The first melis workflow bundle. Fans out across 10 sources in parallel (GitHub, Reddit, Hacker News, news, on-chain stats, prediction markets, arXiv, social, crypto press), triages by cross-source corroboration, and synthesises a structured brief that clears a 10-signal professionalism gate (source diversity, by-the-numbers panel, cross-source corroboration, provenance ribbon, why-it-matters, contrarian voice, named-author citations). Charge-on-success-only: if fewer than 8/10 signals pass after retries you are not billed. Every brief gets an immutable shareable snapshot URL and, once the provenance wallet is funded, an EAS attestation on Base anchoring the content + sources hash.',
+    price: 0.30,
+    priceLabel: '$0.30',
+    priceDisplay: '$0.30 / brief',
+    endpoint: 'https://agents.melis.ai/brief/x402-daily',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'bundle',
+    isBundle: true,
+    sourcesUsed: 10,
+    cacheable: true,
+    exampleSnapshotUrl: '/brief/x402-daily/snap_2da6d0323929',
+    composes: ['scrapepay', 'markdownopt', 'embedpay'],
+    requestExample: { topic: 'x402 ecosystem', lookbackHours: 24, format: 'html' },
+    responseExample: {
+      snapshotUrl: '/brief/x402-daily/snap_2da6d0323929',
+      signalsPassed: 10,
+      sourcesConsulted: 9,
+      attestation: { status: 'deferred', reason: 'provenance wallet pending funding' },
+      costUsdc: 0.06,
+    },
+    alternatives: [
+      {
+        name: 'Roll your own multi-source scraper',
+        notes:
+          'Most agents wire 1-2 sources and skip triage. The defensible work here is the parallel fan-out across 10 source categories, the cross-source corroboration scoring, and the Senior Partner QC gate that enforces 10 professionalism signals — that editorial layer is the IP, not the scraping.',
+      },
+      {
+        name: 'A generic news API',
+        notes:
+          'News APIs give you press only. This bundle triangulates press against GitHub commits, on-chain stats, prediction markets, arXiv and community chatter, and surfaces the cross-source agreement explicitly — which is exactly the synthesis a generic feed cannot do.',
+      },
+    ],
+    scenarios: [
+      'An x402 operator wants a 2-minute daily situational read without scrolling 10 platforms',
+      'A crypto-AI investor agent needs a corroborated daily signal with named-source citations',
+      'A research agent caches the daily brief and re-reads it free via its payment-hash receipt for 30 days',
+      'An agent embeds the immutable snapshot URL in a downstream report for verifiable provenance',
+    ],
+    rateLimit: 'Cached 30 min; a warmer keeps the cache hot so agent calls are served instantly. Cold regeneration ~50s.',
+    failureBehaviour:
+      'Returns HTTP 502 with no_settlement:true if the brief cannot clear 8/10 professionalism signals after 3 attempts (charge-on-success-only). Individual source failures degrade gracefully — the provenance ribbon names any source not consulted (e.g. "Twitter rate-limited"). Snapshot + receipt URLs are always free and never re-bill.',
   },
 ];
 
