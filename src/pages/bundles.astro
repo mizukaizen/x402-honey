@@ -93,7 +93,11 @@ const bundles = services.filter((s) => s.isBundle);
       display: grid;
       grid-template-columns: 1fr;
       gap: 1.5rem;
-      align-items: start;
+      /* stretch (grid default): cards in a row match the tallest card's
+         height; the card's flex-column + footer margin-top:auto then pin
+         the CTAs to the bottom. A lone card (e.g. the 3rd on its own row)
+         only takes its own content height — no weird stretching. */
+      align-items: stretch;
     }
     @media (min-width: 768px) {
       .bundles-grid { grid-template-columns: repeat(2, 1fr); }
