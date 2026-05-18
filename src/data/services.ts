@@ -1017,6 +1017,70 @@ export const services: Service[] = [
     failureBehaviour:
       'Returns HTTP 502 with no_settlement:true if the brief cannot clear 8/10 professionalism signals after 3 attempts (charge-on-success-only). Individual source failures degrade gracefully — the provenance ribbon names any source not consulted (e.g. "Twitter rate-limited"). Snapshot + receipt URLs are always free and never re-bill.',
   },
+  {
+    slug: 'polymarket-alpha',
+    name: 'Polymarket Alpha',
+    tagline:
+      'Daily prediction-market intelligence — odds shifts, smart-money tracking, news catalysts, powered by live melis bot infrastructure',
+    description:
+      'Bundle #2, and the most ingredient-rich yet. Cross-source alpha on Polymarket: 24h odds shifts, smart-money wallet activity (KYA-trust-scored, sourced from the live Polymarket trades feed), news catalysts that move odds, and the proprietary signal — which markets the live melis Polymarket bot fleet is actively monitoring across crypto/weather/sports/maker strategies (aggregate universe only; never positions or P&L). Composes 7 audit-verified melis services + 6 public sources, triages with prediction-market-tuned weighting (recency + strategic), and clears the same 10-signal professionalism gate. Charge-on-success-only; immutable shareable snapshot per run; EAS-anchored once the provenance wallet is funded.',
+    price: 0.50,
+    priceLabel: '$0.50',
+    priceDisplay: '$0.50 / brief',
+    endpoint: 'https://agents.melis.ai/brief/polymarket-alpha',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'bundle',
+    isBundle: true,
+    sourcesUsed: 13,
+    bundleSources: [
+      { id: 'melisBots', name: 'melis Polymarket bots', owned: true, category: 'proprietary', note: 'live watched-market universe' },
+      { id: 'scrapepay', name: 'ScrapePay', owned: true, category: 'press', note: 'market pages' },
+      { id: 'markdownopt', name: 'MarkdownOpt', owned: true, category: 'data', note: '~70% token cut' },
+      { id: 'kyaOracle', name: 'KYA Oracle', owned: true, category: 'on-chain', note: 'wallet trust scores' },
+      { id: 'memoryserve', name: 'MemoryServe', owned: true, category: 'data', note: 'odds-shift recall' },
+      { id: 'memscrub', name: 'MEMSCRUB', owned: true, category: 'safety', note: 'injection scrub' },
+      { id: 'promptguard', name: 'PromptGuard', owned: true, category: 'safety', note: 'topic guard' },
+      { id: 'polymarket', name: 'Polymarket Gamma', owned: false, category: 'prediction' },
+      { id: 'basescan', name: 'Basescan', owned: false, category: 'on-chain' },
+      { id: 'polygonscan', name: 'Polygonscan', owned: false, category: 'on-chain', note: 'Polymarket settlement chain' },
+      { id: 'googlenews', name: 'News (Google News)', owned: false, category: 'press', note: 'odds-moving catalysts' },
+      { id: 'twitter', name: 'Twitter', owned: false, category: 'social', note: 'graceful-degrade' },
+      { id: 'reddit', name: 'Reddit', owned: false, category: 'community' },
+    ],
+    cacheable: true,
+    exampleSnapshotUrl: '/brief/polymarket-alpha/snap_6580b5f53ab5',
+    composes: ['melisBots', 'scrapepay', 'markdownopt', 'kyaOracle', 'memoryserve'],
+    requestExample: { topic: 'live alpha', lookbackHours: 24, format: 'html' },
+    responseExample: {
+      snapshotUrl: '/brief/polymarket-alpha/snap_6580b5f53ab5',
+      signalsPassed: 10,
+      sourcesConsulted: 9,
+      attestation: { status: 'deferred', reason: 'provenance wallet pending funding' },
+      costUsdc: 0.06,
+    },
+    alternatives: [
+      {
+        name: 'Scrape the Polymarket API yourself',
+        notes:
+          'You can pull markets and odds from the Gamma API for free. What you cannot replicate is the watched-market universe of a live bot fleet, KYA trust-scoring of the smart money actually trading, and the editorial gate that turns raw odds into a corroborated read.',
+      },
+      {
+        name: 'A prediction-market newsletter',
+        notes:
+          'Newsletters are human-paced and not machine-consumable per-request. This is a charge-per-brief x402 endpoint an agent calls on demand, with a verifiable immutable snapshot and cross-source provenance.',
+      },
+    ],
+    scenarios: [
+      'An agent trading prediction markets wants a daily corroborated read on odds shifts + smart-money flow',
+      'An alpha researcher tracks which markets a live bot fleet is monitoring without seeing its positions',
+      'A trading agent caches the daily alpha brief and re-reads it free via its payment-hash receipt',
+      'An agent embeds the immutable snapshot URL in a downstream signal report for verifiable provenance',
+    ],
+    rateLimit: 'Cached 10 min; a warmer (every 9 min) keeps the cache hot so agent calls are served instantly. Cold regeneration ~55s.',
+    failureBehaviour:
+      'Returns HTTP 502 with no_settlement:true if the brief cannot clear 8/10 professionalism signals after 3 attempts (charge-on-success-only). HTTP 400 no_settlement on a confirmed-unsafe topic (PromptGuard). Source failures degrade gracefully — the ribbon names any source not consulted (e.g. "Twitter rate-limited", "KYA no wallets"). The bot adapter surfaces aggregate market universe only — never trade size, entry price or P&L. Snapshot + receipt URLs are always free and never re-bill.',
+  },
 ];
 
 export function getService(slug: string): Service | undefined {
