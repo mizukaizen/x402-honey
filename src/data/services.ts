@@ -1081,6 +1081,69 @@ export const services: Service[] = [
     failureBehaviour:
       'Returns HTTP 502 with no_settlement:true if the brief cannot clear 8/10 professionalism signals after 3 attempts (charge-on-success-only). HTTP 400 no_settlement on a confirmed-unsafe topic (PromptGuard). Source failures degrade gracefully — the ribbon names any source not consulted (e.g. "Twitter rate-limited", "KYA no wallets"). The bot adapter surfaces aggregate market universe only — never trade size, entry price or P&L. Snapshot + receipt URLs are always free and never re-bill.',
   },
+  {
+    slug: 'competitor-intel',
+    name: 'Competitor Intel',
+    tagline:
+      "Weekly digest of what your competitors are doing — pricing, features, hiring, key tweets — with change-detection vs last week's snapshot",
+    description:
+      "Bundle #3, and the first production consumer of Sentinel Stage 2. You give it competitors; it scrapes each one's homepage, /pricing, /changelog (or /blog) and /careers via Sentinel (JS-rendered via Crawl4AI/Chromium, Trafilatura extraction, Jina fallback on Cloudflare block), pulls recent tweets, then diffs everything against last week's stored snapshot — surfacing only what changed: new pricing tiers, shipped features, hiring signals, notable tweets, funding/exec moves. First run per competitor is a flagged baseline. The change-detection (own weekly snapshot store, separate from settlement data) is the moat — anyone can scrape a /pricing page once; the value is what changed since last week. LLM synthesis + an 8-signal QC critic gate (charge-on-success-only); immutable shareable snapshot + 30-day receipt per run.",
+    price: 0.75,
+    priceLabel: '$0.75',
+    priceDisplay: '$0.75 / weekly digest',
+    endpoint: 'https://agents.melis.ai/brief/competitor-intel',
+    method: 'POST',
+    wallet: 'microservices',
+    category: 'bundle',
+    isBundle: true,
+    sourcesUsed: 6,
+    bundleSources: [
+      { id: 'sentinel', name: 'Sentinel scrape (Stage 2)', owned: true, category: 'web', note: 'JS-rendered, Trafilatura, Jina fallback' },
+      { id: 'markdownopt', name: 'MarkdownOpt', owned: true, category: 'data', note: '~70% token cut pre-LLM' },
+      { id: 'changedetect', name: 'Change-detection store', owned: true, category: 'proprietary', note: 'weekly snapshot diff — the moat' },
+      { id: 'loopwall', name: 'Loopwall', owned: true, category: 'data', note: 'session token (agent loop)' },
+      { id: 'intentflow', name: 'IntentFlow', owned: true, category: 'data', note: 'scrape→synth handoff' },
+      { id: 'twitter', name: 'Twitter', owned: false, category: 'social', note: 'graceful-degrade' },
+    ],
+    cacheable: true,
+    exampleSnapshotUrl: '/brief/competitor-intel/snap_1387c9b29b1a',
+    composes: ['sentinel', 'markdownopt'],
+    requestExample: {
+      competitors: [
+        { name: 'Linear', url: 'linear.app', twitter: '@linear' },
+        { name: 'Notion', url: 'notion.so' },
+        { name: 'Cursor', url: 'cursor.com' },
+      ],
+      format: 'html',
+    },
+    responseExample: {
+      snapshotUrl: '/brief/competitor-intel/snap_1387c9b29b1a',
+      signalsPassed: 6,
+      pagesScraped: 15,
+      costUsdc: 0.071,
+    },
+    alternatives: [
+      {
+        name: 'Scrape competitor pages yourself',
+        notes:
+          'Anyone can fetch a /pricing page. What you cannot trivially replicate is the weekly change-detection (stored snapshot diff so you see what *changed*, not a re-dump), JS-rendered + Cloudflare-resilient scraping (Sentinel Stage 2), and an editorial QC-gated synthesis across competitors.',
+      },
+      {
+        name: 'A competitive-intel SaaS subscription',
+        notes:
+          'Those are human-paced dashboards on a monthly contract. This is a charge-per-run x402 endpoint an agent calls weekly on demand, with a verifiable immutable snapshot and accumulating private snapshot history (the switching cost).',
+      },
+    ],
+    scenarios: [
+      'A founder agent runs a weekly read on 3-10 competitors without tab-hopping',
+      'A product team tracks competitor pricing/feature/ hiring deltas week over week',
+      'An investor agent monitors portfolio-adjacent companies for funding/exec/launch signals',
+      'An agent embeds the immutable snapshot URL in a board update for verifiable provenance',
+    ],
+    rateLimit: 'Run weekly by the buyer (not cron’d by us). Cold run ~75s for 3 competitors (15 page scrapes). Snapshot + receipt URLs are free and never re-bill.',
+    failureBehaviour:
+      'Returns HTTP 502 with no_settlement:true if the digest cannot clear 6/8 QC signals (charge-on-success-only). Per-page scrape failures degrade gracefully (failed pages noted in meta, run still completes); Twitter degrades to empty. First run per competitor is a flagged baseline (full snapshot, no diff). Snapshot + receipt URLs are always free and never re-bill.',
+  },
 ];
 
 export function getService(slug: string): Service | undefined {
